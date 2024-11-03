@@ -155,6 +155,15 @@ int main() {
     
     while (1) {
         printf("Enter a function number (1-8) or 0 to exit: ");
+        printf("1. Calculate sum and average of 5 float values\n");
+        printf("2. Convert Fahrenheit to Celsius\n");
+        printf("3. Convert time in HH:MM:SS format to seconds\n");
+        printf("4. Split and sum digits of a 3-digit number\n");
+        printf("5. Calculate time difference between two times\n");
+        printf("6. Calculate pass and fail percentage of students\n");
+        printf("7. Calculate max and min of two integers\n");
+        printf("8. (coming soon)\n");
+        printf("Enter your choice here: ");
         scanf("%d", &function_number);
         
         if (function_number == 0) {
@@ -175,7 +184,6 @@ int main() {
         } else if (function_number == 6) {
             calculate_pass_fail_percentage();
         } else if (function_number == 7) {
-            
             calculate_max_min();
         } else if (function_number == 8) {
             // Add your function here
