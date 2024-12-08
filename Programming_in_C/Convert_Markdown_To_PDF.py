@@ -21,7 +21,7 @@ def convert_md_to_pdf(md_file_path, pdf_file_path):
 
 # Convert the file
 md_file_path = 'Programming_in_C/First_Semester/First_Semester_exercises.md'
-pdf_file_path = '/Programming_in_C/First_Semester/First_Semester_exercises.pdf'
+pdf_file_path = 'Programming_in_C/First_Semester/First_Semester_exercises.pdf'  # Removed leading slash
 
 convert_md_to_pdf(md_file_path, pdf_file_path)
 
