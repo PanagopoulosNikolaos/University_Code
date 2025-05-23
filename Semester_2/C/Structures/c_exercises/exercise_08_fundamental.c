@@ -21,7 +21,7 @@ int main() {
 
     // Assign a float value
     d2.type = 1;
-    d2.value.f_val = 45.67f;
+    d2.value.f_val = 45.67f;// (float)(45.67F)
 
     // Print values based on type
     printf("Data 1:\n");
