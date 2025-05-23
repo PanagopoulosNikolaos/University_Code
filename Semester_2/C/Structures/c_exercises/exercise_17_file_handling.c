@@ -1,6 +1,15 @@
 #include <stdio.h>
 #include <string.h>
 
+/*
+ * Exercise 17: Writing Structures to a Text File (CSV format)
+ *
+ * Objective:
+ * Define a structure 'Employee' with 'id', 'name', and 'salary'.
+ * Create an array of 'Employee' structures, populate it,
+ * and write the data to a text file ('employees.csv') in CSV format.
+ */
+
 // Define a structure named Employee
 struct Employee {
     int id;

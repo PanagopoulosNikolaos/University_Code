@@ -1,5 +1,14 @@
 #include <stdio.h>
 
+/*
+ * Exercise 5: Pointers to Structures
+ *
+ * Objective:
+ * Define a structure 'Rectangle' with 'length' and 'width'.
+ * Create a 'Rectangle' variable and a pointer to it.
+ * Use the pointer to access and modify the structure members, then print the values.
+ */
+
 // Define a structure named Rectangle
 struct Rectangle {
     int length;

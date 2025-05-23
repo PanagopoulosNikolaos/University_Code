@@ -2,6 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*
+ * Exercise 19: Deleting a Specific Record from a Binary File
+ *
+ * Objective:
+ * Define a structure 'Task' with 'task_id', 'description', and 'status'.
+ * Write a program that reads a binary file of 'Task' records,
+ * allows the user to specify a 'task_id' to delete,
+ * and then rewrites the file without that record.
+ */
+
 // Define a structure named Task
 struct Task {
     int task_id;

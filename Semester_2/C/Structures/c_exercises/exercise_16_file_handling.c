@@ -2,6 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*
+ * Exercise 16: Reading Records from a File (Text)
+ *
+ * Objective:
+ * Define a structure 'Contact' with 'name', 'phone', and 'email'.
+ * Write a program that reads contact information from a text file (e.g., 'contacts.txt')
+ * where each line represents a contact, and stores them in an array of 'Contact' structures.
+ * Then print the contacts. Assume the format in the file is "Name,Phone,Email".
+ */
+
 #define MAX_CONTACTS 10
 #define MAX_LINE_LENGTH 256
 

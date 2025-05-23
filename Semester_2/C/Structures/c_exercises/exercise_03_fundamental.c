@@ -1,6 +1,15 @@
 #include <stdio.h>
 #include <string.h>
 
+/*
+ * Exercise 3: Array of Structures
+ *
+ * Objective:
+ * Define a structure 'Student' with 'name', 'id', and 'gpa'.
+ * Create an array of 'Student' structures, populate it with data for a few students,
+ * and print their information.
+ */
+
 // Define a structure named Student
 struct Student {
     char name[50];

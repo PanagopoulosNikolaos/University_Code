@@ -1,6 +1,15 @@
 #include <stdio.h>
 #include <string.h>
 
+/*
+ * Exercise 4: Nested Structures
+ *
+ * Objective:
+ * Define a structure 'Address' with 'street', 'city', and 'zip_code'.
+ * Then define a structure 'Person' with 'name', 'age', and an 'Address' structure as a member.
+ * Create a 'Person' variable, assign values including the nested address, and print them.
+ */
+
 // Define Address structure
 struct Address {
     char street[50];

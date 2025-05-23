@@ -1,6 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h> // Required for malloc, free
 
+/*
+ * Exercise 14: Reading Multiple Structures from a File (Binary)
+ *
+ * Objective:
+ * Using the 'Student' structure from Exercise 13, read all student records
+ * from the binary file created in Exercise 13 and print their contents.
+ */
+
 // Define a structure named Student (same as Exercise 13)
 struct Student {
     int id;
@@ -17,8 +25,8 @@ int main() {
     }
 
     // Determine the number of records in the file
-    fseek(fp, 0, SEEK_END);
-    long file_size = ftell(fp);
+    fseek(fp, 0, SEEK_END);// Move to the end of the file
+    long file_size = ftell(fp);// Get the current position (end of file)
     rewind(fp); // Go back to the beginning of the file
 
     int num_students = file_size / sizeof(struct Student);

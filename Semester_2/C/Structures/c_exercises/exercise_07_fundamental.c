@@ -1,5 +1,13 @@
 #include <stdio.h>
 
+/*
+ * Exercise 7: Structures with Bit Fields
+ *
+ * Objective:
+ * Define a structure 'Permissions' using bit fields for read, write, and execute permissions.
+ * Create a 'Permissions' variable, set some permissions, and print them.
+ */
+
 // Define a structure named Permissions using bit fields
 struct Permissions {
     unsigned int read : 1;    // 1 bit for read permission

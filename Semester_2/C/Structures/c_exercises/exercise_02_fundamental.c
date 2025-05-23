@@ -1,6 +1,14 @@
 #include <stdio.h>
 #include <string.h> // Required for strcpy
 
+/*
+ * Exercise 2: Structure with Typedef
+ *
+ * Objective:
+ * Define a structure 'Book' with 'title', 'author', and 'year' using 'typedef'.
+ * Create a 'Book' variable, assign values, and print them.
+ */
+
 // Define a structure named Book using typedef
 typedef struct {
     char title[100];

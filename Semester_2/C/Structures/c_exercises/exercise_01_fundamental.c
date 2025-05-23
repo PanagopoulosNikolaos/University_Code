@@ -1,5 +1,13 @@
 #include <stdio.h>
 
+/*
+ * Exercise 1: Basic Structure Definition and Usage
+ *
+ * Objective:
+ * Define a structure 'Point' with 'x' and 'y' coordinates.
+ * Create a 'Point' variable, assign values (e.g., 10 and 20), and print them.
+ */
+
 // Define a structure named Point
 struct Point {
     int x;

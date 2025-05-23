@@ -1,6 +1,16 @@
 #include <stdio.h>
 #include <math.h> // For math functions, though M_PI might need _USE_MATH_DEFINES or manual definition
 
+/*
+ * Exercise 6: Structures as Function Arguments
+ *
+ * Objective:
+ * Define a structure 'Circle' with 'radius'.
+ * Write a function that takes a 'Circle' structure as an argument,
+ * calculates its area, and returns the area.
+ * In 'main', create a 'Circle' variable, pass it to the function, and print the returned area.
+ */
+
 // Define PI manually for portability
 const double PI = 3.14159265358979323846;
 

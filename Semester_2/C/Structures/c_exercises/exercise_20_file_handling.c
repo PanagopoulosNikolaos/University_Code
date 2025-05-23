@@ -1,6 +1,16 @@
 #include <stdio.h>
 #include <string.h>
 
+/*
+ * Exercise 20: Searching for a Record in a Binary File
+ *
+ * Objective:
+ * Define a structure 'Movie' with 'id', 'title', and 'year'.
+ * Write a program that reads a binary file of 'Movie' records
+ * and allows the user to search for a movie by its 'id'.
+ * If found, print the movie's details.
+ */
+
 // Define a structure named Movie
 struct Movie {
     int id;

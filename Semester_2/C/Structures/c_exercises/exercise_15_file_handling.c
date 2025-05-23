@@ -1,6 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 
+/*
+ * Exercise 15: Appending Structures to a File (Binary)
+ *
+ * Objective:
+ * Define a structure 'Record' with 'id' and 'description'.
+ * Write a program that allows the user to input a new record and append it to an existing binary file.
+ */
+
 // Define a structure named Record
 struct Record {
     int id;

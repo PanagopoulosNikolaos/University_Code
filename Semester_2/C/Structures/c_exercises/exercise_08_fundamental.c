@@ -1,5 +1,14 @@
 #include <stdio.h>
 
+/*
+ * Exercise 8: Union within a Structure
+ *
+ * Objective:
+ * Define a structure 'Data' that contains an integer 'type' and a union 'value'
+ * that can hold either an 'int' or a 'float'.
+ * Create 'Data' variables, assign different types of values, and print them based on the 'type' field.
+ */
+
 // Define a union
 union Value {
     int i_val;

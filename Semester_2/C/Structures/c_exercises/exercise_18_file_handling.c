@@ -1,6 +1,16 @@
 #include <stdio.h>
 #include <string.h>
 
+/*
+ * Exercise 18: Updating a Specific Record in a Binary File
+ *
+ * Objective:
+ * Define a structure 'Item' with 'item_id', 'name', and 'quantity'.
+ * Write a program that reads a binary file of 'Item' records,
+ * allows the user to specify an 'item_id' to update,
+ * and then modifies the 'quantity' for that item in the file.
+ */
+
 // Define a structure named Item
 struct Item {
     int item_id;

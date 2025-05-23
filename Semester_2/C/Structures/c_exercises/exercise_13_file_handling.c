@@ -1,6 +1,15 @@
 #include <stdio.h>
 #include <string.h>
 
+/*
+ * Exercise 13: Writing Multiple Structures to a File (Binary)
+ *
+ * Objective:
+ * Define a structure 'Student' with 'id', 'name', and 'grade'.
+ * Create an array of 'Student' structures, populate it with data for a few students,
+ * and write the entire array to a binary file.
+ */
+
 // Define a structure named Student
 struct Student {
     int id;
