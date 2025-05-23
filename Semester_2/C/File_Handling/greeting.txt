@@ -1,0 +1,3 @@
+Hello, World from C File Handling!
+This is a second line.
+Appending a new message!
