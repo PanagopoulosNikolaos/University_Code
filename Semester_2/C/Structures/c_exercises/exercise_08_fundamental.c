@@ -1,0 +1,42 @@
+#include <stdio.h>
+
+// Define a union
+union Value {
+    int i_val;
+    float f_val;
+};
+
+// Define a structure that includes the union
+struct Data {
+    int type; // 0 for int, 1 for float
+    union Value value;
+};
+
+int main() {
+    struct Data d1, d2;
+
+    // Assign an integer value
+    d1.type = 0;
+    d1.value.i_val = 123;
+
+    // Assign a float value
+    d2.type = 1;
+    d2.value.f_val = 45.67f;
+
+    // Print values based on type
+    printf("Data 1:\n");
+    if (d1.type == 0) {
+        printf("Type: Integer, Value: %d\n", d1.value.i_val);
+    } else {
+        printf("Type: Float, Value: %.2f\n", d1.value.f_val);
+    }
+
+    printf("\nData 2:\n");
+    if (d2.type == 0) {
+        printf("Type: Integer, Value: %d\n", d2.value.i_val);
+    } else {
+        printf("Type: Float, Value: %.2f\n", d2.value.f_val);
+    }
+
+    return 0;
+}
