@@ -28,10 +28,28 @@ int main() {
     strcpy(p1.address.city, "Anytown");
     strcpy(p1.address.zip_code, "12345");
 
+    struct Person p2;
+   
+    strcpy(p2.name, "Jane Smith");
+    p2.age = 28;
+    strcpy(p2.address.street, "456 Elm St");
+    strcpy(p2.address.city, "Othertown");
+    strcpy(p2.address.zip_code, "67890");
+
+    
+
     // Print the values
     printf("Person Name: %s\n", p1.name);
     printf("Person Age: %d\n", p1.age);
     printf("Address: %s, %s, %s\n", p1.address.street, p1.address.city, p1.address.zip_code);
+    // Print a line of dashes matching the length of the city name
+    for (size_t i = 0; i < 50; ++i) {
+        putchar('-');
+    }
+    putchar('\n');
+    printf("Person Name: %s\n", p2.name);
+    printf("Person Age: %d\n", p2.age);
+    printf("Address: %s, %s, %s\n", p2.address.street, p2.address.city, p2.address.zip_code);
 
     return 0;
 }
