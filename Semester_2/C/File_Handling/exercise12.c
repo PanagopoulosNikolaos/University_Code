@@ -21,13 +21,13 @@ int main() {
         printf("%s", lineBuffer);
     }
 
-    if (ferror(file)) {
+    if (ferror(file)) { 
         perror("Error reading file");
         fclose(file);
         return 1;
     }
     if (fclose(file) == EOF) {
-        perror("Error reading file");
+        perror("Error closing file");
         return 1;
     }
     return 0;
