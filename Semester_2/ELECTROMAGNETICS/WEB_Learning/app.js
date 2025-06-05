@@ -219,11 +219,7 @@ function setupSlider(sliderId, valueId, callback) {
         
         // Initialize with current value, but only if needed elements exist
         if (callback) {
-            // Don't call drawing functions that require canvases immediately
-            const callbackName = callback.name;
-            if (callbackName && !callbackName.includes('draw') && !callbackName.includes('Field')) {
-                callback();
-            }
+            callback();
         }
     }
 }
@@ -1656,6 +1652,7 @@ function submitQuiz() {
     
     // Hide navigation
     document.querySelector('.quiz-navigation').style.display = 'none';
+    updateQuizProgress();
 }
 
 function resetQuiz() {
@@ -1758,6 +1755,7 @@ function initializeSectionSpecific(sectionId) {
             break;
         case 'waves':
             initializeWaveAnimations();
+            initializeInterferenceWave();
             break;
         case 'energy':
             calculatePoyntingRealtime();
