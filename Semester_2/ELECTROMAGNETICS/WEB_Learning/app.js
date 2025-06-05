@@ -152,13 +152,16 @@ function initializeSliders() {
     setupSlider('outerRadiusSlider', 'outerRadiusValue', calculateCapacitanceRealtime);
     setupSlider('lengthSlider', 'lengthValue', calculateCapacitanceRealtime);
     setupSlider('innerSphereSlider', 'innerSphereValue', calculateCapacitanceRealtime);
-    setupSlider('outerSphereSlider', 'outerSphereValue', calculateCapacitanceRealtime);
+    setupSlider('outerSphereSlider', 'outerRadiusValue', calculateCapacitanceRealtime);
     
     // Current sliders
     setupSlider('voltageSliderOhm', 'voltageValueOhm', calculateOhmRealtime);
     setupSlider('resistanceSliderOhm', 'resistanceValueOhm', calculateOhmRealtime);
     setupSlider('currentSliderPower', 'currentValuePower', calculatePowerRealtime);
     setupSlider('resistanceSliderPower', 'resistanceValuePower', calculatePowerRealtime);
+    
+    // I-V Graph slider (separate from ohm calculation)
+    setupSlider('resistanceGraphSlider', 'resistanceGraphValue', drawIVGraph);
     
     // Circuit sliders
     setupSlider('r1Slider', 'r1Value', calculateCircuitRealtime);
@@ -173,6 +176,16 @@ function initializeSliders() {
     setupSlider('magneticForceSlider', 'magneticForceValue', calculateMagneticForceRealtime);
     setupSlider('angleForceSlider', 'angleForceValue', calculateMagneticForceRealtime);
     
+    // Magnetic flux sliders
+    setupSlider('fluxAreaSlider', 'fluxAreaValue', function() {
+        calculateFluxRealtime();
+        drawMagneticFlux();
+    });
+    setupSlider('fluxAngleSlider', 'fluxAngleValue', function() {
+        calculateFluxRealtime();
+        drawMagneticFlux();
+    });
+    
     // Wave sliders
     setupSlider('linearFreqSlider', 'linearFreqValue', updateLinearWave);
     setupSlider('linearAmpSlider', 'linearAmpValue', updateLinearWave);
@@ -186,6 +199,14 @@ function initializeSliders() {
     setupSlider('poyntingFreqSlider', 'poyntingFreqValue', updatePoyntingVisualization);
     setupSlider('wavelengthPhotoSlider', 'wavelengthPhotoValue', calculatePhotoelectricRealtime);
     setupSlider('intensityPhotoSlider', 'intensityPhotoValue', updatePhotoelectricVisualization);
+    
+    // Energy density sliders
+    setupSlider('electricFieldDensitySlider', 'electricFieldDensityValue', calculateEnergyDensityRealtime);
+    setupSlider('volumeDensitySlider', 'volumeDensityValue', calculateEnergyDensityRealtime);
+    
+    // Photon momentum sliders
+    setupSlider('photonEnergySlider', 'photonEnergyValue', calculatePhotonMomentumRealtime);
+    setupSlider('photonNumberSlider', 'photonNumberValue', calculatePhotonMomentumRealtime);
     
     // Spectrum slider
     setupSlider('spectrumFreqSlider', 'spectrumFreqValue', updateSpectrumInfo);
@@ -526,6 +547,33 @@ function calculateMagneticForceRealtime() {
     if (resultDiv) resultDiv.innerHTML = result;
 }
 
+// Magnetic Flux Calculations
+function calculateFluxRealtime() {
+    const area = parseFloat(document.getElementById('fluxAreaSlider')?.value || 0.01);
+    const angle = parseFloat(document.getElementById('fluxAngleSlider')?.value || 0);
+    const magneticField = 0.5; // Fixed B field for demonstration (T)
+    
+    const angleRad = angle * Math.PI / 180;
+    const flux = magneticField * area * Math.cos(angleRad);
+    
+    const result = `
+        <strong>Μαγνητική Ροή:</strong><br>
+        Φ = B·A·cos(θ)<br>
+        Φ = ${magneticField} × ${area} × cos(${angle}°)<br>
+        <strong>Ροή:</strong> Φ = ${flux.toFixed(6)} Wb<br><br>
+        
+        <strong>Ανάλυση:</strong><br>
+        Εμβαδόν: A = ${area} m²<br>
+        Γωνία: θ = ${angle}° (${angleRad.toFixed(3)} rad)<br>
+        Συνιστώσα B⊥: B⊥ = ${(magneticField * Math.cos(angleRad)).toFixed(3)} T<br><br>
+        
+        <em>Η ροή είναι μέγιστη όταν θ = 0° (κάθετη επιφάνεια)</em>
+    `;
+    
+    const resultDiv = document.getElementById('fluxResult');
+    if (resultDiv) resultDiv.innerHTML = result;
+}
+
 // Energy and Photon Calculations
 function calculatePoyntingRealtime() {
     const electricField = parseFloat(document.getElementById('eFieldSlider')?.value || 100);
@@ -549,6 +597,82 @@ function calculatePoyntingRealtime() {
     `;
     
     const resultDiv = document.getElementById('poyntingResult');
+    if (resultDiv) resultDiv.innerHTML = result;
+}
+
+function calculateEnergyDensityRealtime() {
+    const electricField = parseFloat(document.getElementById('electricFieldDensitySlider')?.value || 1000);
+    const volume = parseFloat(document.getElementById('volumeDensitySlider')?.value || 0.001);
+    
+    // Calculate energy densities
+    const electricEnergyDensity = 0.5 * CONSTANTS.EPSILON_0 * electricField * electricField;
+    const magneticField = electricField / CONSTANTS.C; // For plane wave in vacuum
+    const magneticEnergyDensity = 0.5 * magneticField * magneticField / CONSTANTS.MU_0;
+    const totalEnergyDensity = electricEnergyDensity + magneticEnergyDensity;
+    
+    // Calculate total energy in the volume
+    const totalEnergy = totalEnergyDensity * volume;
+    
+    const result = `
+        <strong>Πυκνότητα Ενέργειας Ηλεκτρομαγνητικού Πεδίου:</strong><br>
+        Ηλεκτρικό πεδίο: E = ${electricField} V/m<br>
+        Μαγνητικό πεδίο: B = E/c = ${magneticField.toExponential(3)} T<br>
+        Όγκος: V = ${volume} m³<br><br>
+        
+        <strong>Πυκνότητες Ενέργειας:</strong><br>
+        Ηλεκτρική: uₑ = ½ε₀E² = ${electricEnergyDensity.toExponential(3)} J/m³<br>
+        Μαγνητική: uᵦ = ½B²/μ₀ = ${magneticEnergyDensity.toExponential(3)} J/m³<br>
+        <strong>Συνολική:</strong> u = uₑ + uᵦ = ${totalEnergyDensity.toExponential(3)} J/m³<br><br>
+        
+        <strong>Συνολική Ενέργεια στον Όγκο:</strong><br>
+        U = u × V = ${totalEnergy.toExponential(3)} J<br>
+        
+        <em>Για επίπεδο κύμα στο κενό: uₑ = uᵦ</em>
+    `;
+    
+    const resultDiv = document.getElementById('energyDensityResult');
+    if (resultDiv) resultDiv.innerHTML = result;
+}
+
+function calculatePhotonMomentumRealtime() {
+    const photonEnergy = parseFloat(document.getElementById('photonEnergySlider')?.value || 2); // eV
+    const photonNumber = parseFloat(document.getElementById('photonNumberSlider')?.value || 1000);
+    
+    // Convert energy to Joules
+    const photonEnergyJ = photonEnergy * CONSTANTS.E;
+    
+    // Calculate photon properties
+    const frequency = photonEnergyJ / CONSTANTS.H;
+    const wavelength = CONSTANTS.C / frequency;
+    const photonMomentum = CONSTANTS.H / wavelength;
+    
+    // Calculate total momentum and energy
+    const totalMomentum = photonMomentum * photonNumber;
+    const totalEnergy = photonEnergyJ * photonNumber;
+    
+    // Calculate radiation pressure (for complete absorption)
+    const beamArea = 0.001; // Assume 1 cm² beam area
+    const radiationPressure = totalMomentum / (beamArea * 1); // Assuming 1 second exposure
+    
+    const result = `
+        <strong>Ιδιότητες Φωτονίων:</strong><br>
+        Ενέργεια ανά φωτόνιο: E = ${photonEnergy} eV = ${photonEnergyJ.toExponential(3)} J<br>
+        Συχνότητα: f = E/h = ${frequency.toExponential(3)} Hz<br>
+        Μήκος κύματος: λ = c/f = ${(wavelength * 1e9).toFixed(1)} nm<br>
+        Ορμή ανά φωτόνιο: p = h/λ = ${photonMomentum.toExponential(3)} kg⋅m/s<br><br>
+        
+        <strong>Συλλογικές Ιδιότητες (${photonNumber} φωτόνια):</strong><br>
+        Συνολική ενέργεια: Eₜₒₜₐₗ = ${totalEnergy.toExponential(3)} J<br>
+        Συνολική ορμή: pₜₒₜₐₗ = ${totalMomentum.toExponential(3)} kg⋅m/s<br><br>
+        
+        <strong>Πίεση Ακτινοβολίας:</strong><br>
+        Επιφάνεια δέσμης: A = ${beamArea * 1e4} cm²<br>
+        Πίεση (πλήρης απορρόφηση): P = pₜₒₜₐₗ/A = ${radiationPressure.toExponential(3)} N/m²<br>
+        
+        <em>Η πίεση ακτινοβολίας χρησιμοποιείται σε ηλιακά πανιά</em>
+    `;
+    
+    const resultDiv = document.getElementById('photonMomentumResult');
     if (resultDiv) resultDiv.innerHTML = result;
 }
 
@@ -1043,6 +1167,97 @@ function drawMagneticField3D() {
     }
 }
 
+function drawMagneticFlux() {
+    const canvas = document.getElementById('magneticFluxCanvas');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const area = parseFloat(document.getElementById('fluxAreaSlider')?.value || 0.01);
+    const angle = parseFloat(document.getElementById('fluxAngleSlider')?.value || 0);
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const surfaceWidth = Math.sqrt(area) * 2000; // Scale for visualization
+    const surfaceHeight = surfaceWidth * 0.6;
+    
+    // Draw uniform magnetic field lines (background)
+    ctx.strokeStyle = 'rgba(33, 128, 141, 0.3)';
+    ctx.lineWidth = 2;
+    const fieldSpacing = 25;
+    for (let x = 0; x < canvas.width; x += fieldSpacing) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+        
+        // Add field arrows
+        for (let y = 20; y < canvas.height; y += 40) {
+            drawArrowDown(ctx, x, y);
+        }
+    }
+    
+    // Draw surface (rectangle) tilted by angle
+    const angleRad = angle * Math.PI / 180;
+    
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate(angleRad);
+    
+    // Surface
+    ctx.fillStyle = 'rgba(255, 68, 68, 0.3)';
+    ctx.strokeStyle = '#ff4444';
+    ctx.lineWidth = 3;
+    ctx.fillRect(-surfaceWidth/2, -surfaceHeight/2, surfaceWidth, surfaceHeight);
+    ctx.strokeRect(-surfaceWidth/2, -surfaceHeight/2, surfaceWidth, surfaceHeight);
+    
+    // Normal vector
+    ctx.strokeStyle = '#ff4444';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, -60);
+    ctx.stroke();
+    
+    // Normal vector arrow
+    ctx.fillStyle = '#ff4444';
+    ctx.beginPath();
+    ctx.moveTo(0, -60);
+    ctx.lineTo(-8, -45);
+    ctx.lineTo(8, -45);
+    ctx.closePath();
+    ctx.fill();
+    
+    ctx.restore();
+    
+    // Draw angle arc
+    if (angle > 0) {
+        ctx.strokeStyle = '#134252';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 80, -Math.PI/2, -Math.PI/2 + angleRad);
+        ctx.stroke();
+        
+        // Angle label
+        ctx.fillStyle = '#134252';
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(`θ = ${angle}°`, centerX + 60, centerY + 20);
+    }
+    
+    // Labels and info
+    ctx.fillStyle = '#134252';
+    ctx.font = '14px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText('Μαγνητικό πεδίο B (ομοιόμορφο)', 10, 25);
+    ctx.fillText(`Επιφάνεια: A = ${area} m²`, 10, 45);
+    ctx.fillStyle = '#ff4444';
+    ctx.fillText('Κόκκινο: Επιφάνεια & κάθετο διάνυσμα', 10, canvas.height - 40);
+    ctx.fillStyle = '#21808d';
+    ctx.fillText('Μπλε: Γραμμές μαγνητικού πεδίου', 10, canvas.height - 20);
+}
+
 function drawStraightWireField(ctx, width, height, current) {
     const centerX = width / 2;
     const centerY = height / 2;
@@ -1521,9 +1736,17 @@ function toggleEllipticalWave() {
     if (btn) btn.textContent = animationStates.ellipticalWave ? 'Παύση' : 'Εκκίνηση';
 }
 
+function toggleFieldCoupling() {
+    animationStates.fieldCoupling = !animationStates.fieldCoupling;
+    const btn = document.getElementById('toggleCoupling');
+    if (btn) btn.textContent = animationStates.fieldCoupling ? 'Παύση' : 'Εκκίνηση Animation';
+}
+
 // Enhanced Quiz System
 function initializeQuiz() {
+    currentQuizQuestion = 0; // Start at 0 so updateQuizProgress shows 0/10 initially
     updateQuizProgress();
+    currentQuizQuestion = 1; // Then set to 1 for the first question
     showQuizQuestion(1);
 }
 
@@ -1569,12 +1792,15 @@ function updateQuizProgress() {
     const progressText = document.getElementById('progressText');
     
     if (progressFill) {
+        // For progress bar, show actual progress (0% when on question 0, 10% when on question 1, etc.)
         const percentage = (currentQuizQuestion / totalQuizQuestions) * 100;
         progressFill.style.width = `${percentage}%`;
     }
     
     if (progressText) {
-        progressText.textContent = `${currentQuizQuestion}/${totalQuizQuestions}`;
+        // For text, show current question / total (but never show 0/10, show 1/10 minimum)
+        const displayQuestion = Math.max(1, currentQuizQuestion);
+        progressText.textContent = `${displayQuestion}/${totalQuizQuestions}`;
     }
 }
 
@@ -1749,9 +1975,11 @@ function initializeSectionSpecific(sectionId) {
             calculateOhmRealtime();
             calculatePowerRealtime(); // Added for initial calculation
             calculateCircuitRealtime(); // Added for initial draw
+            drawIVGraph(); // Added for initial I-V graph draw
             break;
         case 'magnetostatics':
             drawMagneticField3D();
+            drawMagneticFlux();
             break;
         case 'waves':
             initializeWaveAnimations();
@@ -1800,8 +2028,8 @@ function drawIVGraph() {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
-    // Use resistanceSliderOhm to match the slider used in calculateOhmRealtime
-    const resistance = parseFloat(document.getElementById('resistanceSliderOhm')?.value || 10); 
+    // Use resistanceGraphSlider for the I-V graph display
+    const resistance = parseFloat(document.getElementById('resistanceGraphSlider')?.value || 10); 
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
@@ -1862,12 +2090,6 @@ function initializeFieldCoupling() {
         requestAnimationFrame(animate);
     }
     animate();
-}
-
-function toggleFieldCoupling() {
-    animationStates.fieldCoupling = !animationStates.fieldCoupling;
-    const btn = document.getElementById('toggleCoupling');
-    if (btn) btn.textContent = animationStates.fieldCoupling ? 'Παύση' : 'Εκκίνηση Animation';
 }
 
 function drawFieldCoupling(canvas, time) {
@@ -1937,6 +2159,9 @@ function initializeInterferenceWave() {
     const canvas = document.getElementById('interferenceCanvas');
     if (!canvas) return;
     
+    // Draw initial interference pattern
+    drawInterference(canvas);
+    
     function animate() {
         if (animationStates.interference) {
             drawInterference(canvas);
@@ -1947,6 +2172,11 @@ function initializeInterferenceWave() {
 }
 
 function drawInterference(canvas) {
+    if (!canvas) {
+        canvas = document.getElementById('interferenceCanvas');
+        if (!canvas) return;
+    }
+    
     const ctx = canvas.getContext('2d');
     const amp1 = parseFloat(document.getElementById('amp1Slider')?.value || 30);
     const amp2 = parseFloat(document.getElementById('amp2Slider')?.value || 30);
