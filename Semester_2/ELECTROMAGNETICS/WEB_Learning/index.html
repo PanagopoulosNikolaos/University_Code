@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Αρχές Ηλεκτρομαγνητισμού και Τηλεπικοινωνιών</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            }
+        };
+    </script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h2>Ηλεκτρομαγνητισμός</h2>
+            </div>
+            <div class="nav-menu">
+                <button class="nav-item" data-section="home">Αρχική</button>
+                <button class="nav-item" data-section="mathematics">Μαθηματικά</button>
+                <button class="nav-item" data-section="electrostatics">Ηλεκτροστατική</button>
+                <button class="nav-item" data-section="capacitors">Πυκνωτές</button>
+                <button class="nav-item" data-section="current">Ρεύμα</button>
+                <button class="nav-item" data-section="magnetostatics">Μαγνητοστατική</button>
+                <button class="nav-item" data-section="maxwell">Maxwell</button>
+                <button class="nav-item" data-section="waves">Κύματα</button>
+                <button class="nav-item" data-section="energy">Ενέργεια</button>
+                <button class="nav-item" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- Home Section -->
+        <section id="home" class="content-section active">
+            <div class="container">
+                <div class="hero">
+                    <h1>Αρχές Ηλεκτρομαγνητισμού και Τηλεπικοινωνιών</h1>
+                    <p class="lead">Διδάσκων: Τσορμπατζόγλου Ανδρέας</p>
+                </div>
+                
+                <div class="course-info">
+                    <div class="card">
+                        <div class="card__body">
+                            <h3>Πληροφορίες Μαθήματος</h3>
+                            <p><strong>Ώρες Διαλέξεων:</strong> Πέμπτη 13:00-16:00, Παρασκευή 13:00-14:00</p>
+                            <p><strong>Αίθουσα:</strong> Αμφιθέατρο Α</p>
+                            <p><strong>1η Πρόοδος:</strong> Πέμπτη 27 Μαρτίου, 13:00-15:00</p>
+                            <p><strong>2η Πρόοδος:</strong> Πέμπτη 29 Μαΐου, 13:00-15:00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topics-grid">
+                    <div class="topic-card" data-section="mathematics">
+                        <h3>Μαθηματικά Εργαλεία</h3>
+                        <p>Διανύσματα, τελεστές, συντεταγμένα συστήματα</p>
+                    </div>
+                    <div class="topic-card" data-section="electrostatics">
+                        <h3>Ηλεκτροστατική</h3>
+                        <p>Νόμος Coulomb, ηλεκτρικό πεδίο, δυναμικό</p>
+                    </div>
+                    <div class="topic-card" data-section="capacitors">
+                        <h3>Πυκνωτές</h3>
+                        <p>Χωρητικότητα, διηλεκτρικά, τύποι πυκνωτών</p>
+                    </div>
+                    <div class="topic-card" data-section="current">
+                        <h3>Ρεύμα και Αντίσταση</h3>
+                        <p>Νόμος Ohm, νόμοι Kirchhoff, ισχύς</p>
+                    </div>
+                    <div class="topic-card" data-section="magnetostatics">
+                        <h3>Μαγνητοστατική</h3>
+                        <p>Μαγνητικό πεδίο, νόμος Ampère, δυνάμεις</p>
+                    </div>
+                    <div class="topic-card" data-section="maxwell">
+                        <h3>Εξισώσεις Maxwell</h3>
+                        <p>Ενοποίηση ηλεκτρισμού και μαγνητισμού</p>
+                    </div>
+                    <div class="topic-card" data-section="waves">
+                        <h3>Ηλεκτρομαγνητικά Κύματα</h3>
+                        <p>Διάδοση, πόλωση, ηλεκτρομαγνητικό φάσμα</p>
+                    </div>
+                    <div class="topic-card" data-section="energy">
+                        <h3>Ενέργεια και Φωτόνια</h3>
+                        <p>Διάνυσμα Poynting, φωτοηλεκτρικό φαινόμενο</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mathematics Section -->
+        <section id="mathematics" class="content-section">
+            <div class="container">
+                <h1>Μαθηματικά Εργαλεία</h1>
+                
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Διανύσματα σε Καρτεσιανό Σύστημα</h3>
+                        <p>Διάνυσμα: \(\vec{a} = a_x\hat{x} + a_y\hat{y} + a_z\hat{z}\)</p>
+                        
+                        <h4>Πράξεις Διανυσμάτων</h4>
+                        <p><strong>Πρόσθεση:</strong> \(\vec{a} + \vec{b} = (a_x + b_x, a_y + b_y, a_z + b_z)\)</p>
+                        <p><strong>Εσωτερικό Γινόμενο:</strong> \(\vec{a} \cdot \vec{b} = a_x b_x + a_y b_y + a_z b_z = |\vec{a}||\vec{b}|\cos\theta\)</p>
+                        <p><strong>Εξωτερικό Γινόμενο:</strong> \(\vec{a} \times \vec{b} = |\vec{a}||\vec{b}|\sin\theta \hat{n}\)</p>
+                    </div>
+                </div>
+
+                <div class="calculator-section">
+                    <h3>Αριθμομηχανή Διανυσμάτων</h3>
+                    <div class="vector-calculator">
+                        <div class="vector-inputs">
+                            <div>
+                                <label>Διάνυσμα A:</label>
+                                <input type="number" id="ax" placeholder="x" value="1">
+                                <input type="number" id="ay" placeholder="y" value="2">
+                                <input type="number" id="az" placeholder="z" value="3">
+                            </div>
+                            <div>
+                                <label>Διάνυσμα B:</label>
+                                <input type="number" id="bx" placeholder="x" value="4">
+                                <input type="number" id="by" placeholder="y" value="5">
+                                <input type="number" id="bz" placeholder="z" value="6">
+                            </div>
+                        </div>
+                        <div class="vector-results">
+                            <button onclick="calculateVectorOps()" class="btn btn--primary">Υπολόγισε</button>
+                            <div id="vectorResults"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Διαφορικοί Τελεστές</h3>
+                        <p><strong>Απόκλιση (Divergence):</strong> \(\nabla \cdot \vec{F} = \frac{\partial F_x}{\partial x} + \frac{\partial F_y}{\partial y} + \frac{\partial F_z}{\partial z}\)</p>
+                        <p><strong>Στροβιλισμός (Curl):</strong> \(\nabla \times \vec{F} = \left(\frac{\partial F_z}{\partial y} - \frac{\partial F_y}{\partial z}\right)\hat{x} + \left(\frac{\partial F_x}{\partial z} - \frac{\partial F_z}{\partial x}\right)\hat{y} + \left(\frac{\partial F_y}{\partial x} - \frac{\partial F_x}{\partial y}\right)\hat{z}\)</p>
+                        <p><strong>Λαπλασιανός:</strong> \(\nabla^2 \phi = \frac{\partial^2 \phi}{\partial x^2} + \frac{\partial^2 \phi}{\partial y^2} + \frac{\partial^2 \phi}{\partial z^2}\)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Electrostatics Section -->
+        <section id="electrostatics" class="content-section">
+            <div class="container">
+                <h1>Ηλεκτροστατική</h1>
+                
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Νόμος του Coulomb</h3>
+                        <p>Η δύναμη μεταξύ δύο σημειακών φορτίων:</p>
+                        <p>\[F_{e21} = \frac{1}{4\pi\varepsilon_0} \frac{q_1q_2}{R_{12}^2} \hat{R}_{12}\]</p>
+                        <p>όπου \(\varepsilon_0 = 8.854 \times 10^{-12}\) F/m</p>
+                    </div>
+                </div>
+
+                <div class="calculator-section">
+                    <h3>Αριθμομηχανή Νόμου Coulomb</h3>
+                    <div class="coulomb-calculator">
+                        <div class="form-group">
+                            <label>Φορτίο q₁ (C):</label>
+                            <input type="number" id="q1" value="1e-6" step="any">
+                        </div>
+                        <div class="form-group">
+                            <label>Φορτίο q₂ (C):</label>
+                            <input type="number" id="q2" value="2e-6" step="any">
+                        </div>
+                        <div class="form-group">
+                            <label>Απόσταση r (m):</label>
+                            <input type="number" id="distance" value="0.1" step="any">
+                        </div>
+                        <button onclick="calculateCoulombForce()" class="btn btn--primary">Υπολόγισε Δύναμη</button>
+                        <div id="coulombResult"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Ηλεκτρικό Πεδίο</h3>
+                        <p>Ένταση ηλεκτρικού πεδίου:</p>
+                        <p>\[\vec{E} = \frac{\vec{F}}{q_0}\]</p>
+                        <p>Για σημειακό φορτίο:</p>
+                        <p>\[\vec{E} = \frac{1}{4\pi\varepsilon_0} \frac{q}{r^2} \hat{r}\]</p>
+                    </div>
+                </div>
+
+                <div class="visualization">
+                    <h3>Οπτικοποίηση Ηλεκτρικού Πεδίου</h3>
+                    <canvas id="electricFieldCanvas" width="500" height="400"></canvas>
+                    <div class="controls">
+                        <label>Φορτίο (μC):</label>
+                        <input type="range" id="chargeSlider" min="-10" max="10" value="5" step="1">
+                        <span id="chargeValue">5</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Ηλεκτρικό Δυναμικό</h3>
+                        <p>Το ηλεκτρικό δυναμικό ορίζεται ως:</p>
+                        <p>\[\varphi = -\int \vec{E} \cdot d\vec{l}\]</p>
+                        <p>Σχέση με το ηλεκτρικό πεδίο:</p>
+                        <p>\[\vec{E} = -\nabla \varphi\]</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Νόμος του Gauss</h3>
+                        <p>Η ηλεκτρική ροή μέσω κλειστής επιφάνειας:</p>
+                        <p>\[\oint \vec{E} \cdot d\vec{S} = \frac{Q_{εσω}}{\varepsilon_0}\]</p>
+                        <p>Διαφορική μορφή:</p>
+                        <p>\[\nabla \cdot \vec{E} = \frac{\rho}{\varepsilon_0}\]</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Capacitors Section -->
+        <section id="capacitors" class="content-section">
+            <div class="container">
+                <h1>Πυκνωτές</h1>
+                
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Χωρητικότητα</h3>
+                        <p>Η χωρητικότητα ενός πυκνωτή ορίζεται ως:</p>
+                        <p>\[C = \frac{Q}{V}\]</p>
+                        <p>Μονάδα: Farad (F) = C/V</p>
+                    </div>
+                </div>
+
+                <div class="capacitor-types">
+                    <h3>Τύποι Πυκνωτών</h3>
+                    
+                    <div class="card">
+                        <div class="card__body">
+                            <h4>Πυκνωτής Παράλληλων Πλακών</h4>
+                            <p>\[C = \frac{\varepsilon_0\varepsilon_r A}{d}\]</p>
+                            <p>όπου A η επιφάνεια των πλακών και d η απόσταση</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__body">
+                            <h4>Κυλινδρικός Πυκνωτής</h4>
+                            <p>\[C = \frac{2\pi\varepsilon_0\varepsilon_r l}{\ln(b/a)}\]</p>
+                            <p>όπου a, b οι ακτίνες και l το μήκος</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__body">
+                            <h4>Σφαιρικός Πυκνωτής</h4>
+                            <p>\[C = \frac{4\pi\varepsilon_0\varepsilon_r R_1R_2}{R_2-R_1}\]</p>
+                            <p>όπου R₁, R₂ οι ακτίνες των σφαιρών</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calculator-section">
+                    <h3>Αριθμομηχανή Πυκνωτών</h3>
+                    <div class="capacitor-calculator">
+                        <div class="form-group">
+                            <label>Τύπος Πυκνωτή:</label>
+                            <select id="capacitorType">
+                                <option value="parallel">Παράλληλες Πλάκες</option>
+                                <option value="cylindrical">Κυλινδρικός</option>
+                                <option value="spherical">Σφαιρικός</option>
+                            </select>
+                        </div>
+                        
+                        <div id="parallelInputs" class="capacitor-inputs">
+                            <div class="form-group">
+                                <label>Επιφάνεια A (m²):</label>
+                                <input type="number" id="area" value="0.01" step="any">
+                            </div>
+                            <div class="form-group">
+                                <label>Απόσταση d (m):</label>
+                                <input type="number" id="separation" value="0.001" step="any">
+                            </div>
+                            <div class="form-group">
+                                <label>Σχετική διηλεκτρική σταθερά εᵣ:</label>
+                                <input type="number" id="permittivity" value="1" step="any">
+                            </div>
+                        </div>
+
+                        <div id="cylindricalInputs" class="capacitor-inputs hidden">
+                            <div class="form-group">
+                                <label>Εσωτερική ακτίνα a (m):</label>
+                                <input type="number" id="innerRadius" value="0.01" step="any">
+                            </div>
+                            <div class="form-group">
+                                <label>Εξωτερική ακτίνα b (m):</label>
+                                <input type="number" id="outerRadius" value="0.02" step="any">
+                            </div>
+                            <div class="form-group">
+                                <label>Μήκος l (m):</label>
+                                <input type="number" id="length" value="0.1" step="any">
+                            </div>
+                        </div>
+
+                        <div id="sphericalInputs" class="capacitor-inputs hidden">
+                            <div class="form-group">
+                                <label>Εσωτερική ακτίνα R₁ (m):</label>
+                                <input type="number" id="innerSphere" value="0.01" step="any">
+                            </div>
+                            <div class="form-group">
+                                <label>Εξωτερική ακτίνα R₂ (m):</label>
+                                <input type="number" id="outerSphere" value="0.02" step="any">
+                            </div>
+                        </div>
+
+                        <button onclick="calculateCapacitance()" class="btn btn--primary">Υπολόγισε Χωρητικότητα</button>
+                        <div id="capacitanceResult"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Διηλεκτρικά Υλικά</h3>
+                        <p>Τα διηλεκτρικά υλικά τοποθετούνται μεταξύ των πλακών για:</p>
+                        <ul>
+                            <li>Αύξηση της χωρητικότητας</li>
+                            <li>Μείωση του κινδύνου διάσπασης</li>
+                            <li>Μηχανική υποστήριξη των πλακών</li>
+                        </ul>
+                        <p>Διηλεκτρική μετατόπιση: \(\vec{D} = \varepsilon_0\varepsilon_r\vec{E} = \varepsilon\vec{E}\)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Current Section -->
+        <section id="current" class="content-section">
+            <div class="container">
+                <h1>Ρεύμα και Αντίσταση</h1>
+                
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Πυκνότητα Ρεύματος</h3>
+                        <p>Η πυκνότητα ρεύματος ορίζεται ως:</p>
+                        <p>\[\vec{J} = \rho \vec{u} = nq\vec{u}\]</p>
+                        <p>όπου ρ η πυκνότητα φορτίου, n ο αριθμός φορέων, q το φορτίο, u η ταχύτητα</p>
+                        
+                        <p>Ηλεκτρικό ρεύμα:</p>
+                        <p>\[I = \frac{dQ}{dt} = \int\int \vec{J} \cdot d\vec{S}\]</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Νόμος του Ohm</h3>
+                        <p>Γενικευμένη μορφή:</p>
+                        <p>\[\vec{J} = \sigma\vec{E}\]</p>
+                        <p>όπου σ η ηλεκτρική αγωγιμότητα</p>
+                        
+                        <p>Κλασική μορφή:</p>
+                        <p>\[V = IR\]</p>
+                        <p>Αντίσταση: \(R = \rho\frac{L}{A}\) όπου ρ η ειδική αντίσταση</p>
+                    </div>
+                </div>
+
+                <div class="calculator-section">
+                    <h3>Αριθμομηχανή Νόμου Ohm</h3>
+                    <div class="ohm-calculator">
+                        <div class="form-group">
+                            <label>Τάση V (V):</label>
+                            <input type="number" id="voltage" value="12" step="any">
+                        </div>
+                        <div class="form-group">
+                            <label>Αντίσταση R (Ω):</label>
+                            <input type="number" id="resistance" value="6" step="any">
+                        </div>
+                        <button onclick="calculateOhm()" class="btn btn--primary">Υπολόγισε</button>
+                        <div id="ohmResult"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Νόμοι του Kirchhoff</h3>
+                        
+                        <h4>Νόμος Ρευμάτων (KCL)</h4>
+                        <p>Το άθροισμα των ρευμάτων σε έναν κόμβο είναι μηδέν:</p>
+                        <p>\[\sum I_{είσοδος} = \sum I_{έξοδος}\]</p>
+                        
+                        <h4>Νόμος Τάσεων (KVL)</h4>
+                        <p>Το άθροισμα των τάσεων σε κλειστό βρόχο είναι μηδέν:</p>
+                        <p>\[\sum V = 0\]</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Νόμος του Joule</h3>
+                        <p>Η ισχύς που καταναλώνεται σε έναν αντιστάτη:</p>
+                        <p>\[P = I^2R = IV = \frac{V^2}{R}\]</p>
+                        
+                        <p>Ισχύς ανά μονάδα όγκου:</p>
+                        <p>\[p = \vec{J} \cdot \vec{E} = \frac{J^2}{\sigma} = \sigma E^2\]</p>
+                    </div>
+                </div>
+
+                <div class="calculator-section">
+                    <h3>Αριθμομηχανή Ισχύος</h3>
+                    <div class="power-calculator">
+                        <div class="form-group">
+                            <label>Ρεύμα I (A):</label>
+                            <input type="number" id="current" value="2" step="any">
+                        </div>
+                        <div class="form-group">
+                            <label>Αντίσταση R (Ω):</label>
+                            <input type="number" id="powerResistance" value="6" step="any">
+                        </div>
+                        <button onclick="calculatePower()" class="btn btn--primary">Υπολόγισε Ισχύ</button>
+                        <div id="powerResult"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Εξίσωση Συνέχειας</h3>
+                        <p>Ολοκληρωτική μορφή:</p>
+                        <p>\[\frac{dQ}{dt} = -\int\int \vec{J} \cdot d\vec{S}\]</p>
+                        
+                        <p>Διαφορική μορφή:</p>
+                        <p>\[\nabla \cdot \vec{J} + \frac{\partial \rho}{\partial t} = 0\]</p>
+                        
+                        <p>Για σταθερό ρεύμα: \(\nabla \cdot \vec{J} = 0\)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Magnetostatics Section -->
+        <section id="magnetostatics" class="content-section">
+            <div class="container">
+                <h1>Μαγνητοστατική</h1>
+                
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Μαγνητικό Πεδίο</h3>
+                        <p>Το μαγνητικό πεδίο παράγεται από κινούμενα φορτία (ρεύματα)</p>
+                        <p>Μαγνητική επαγωγή: \(\vec{B}\) (Tesla)</p>
+                        <p>Ένταση μαγνητικού πεδίου: \(\vec{H} = \frac{\vec{B}}{\mu_0}\)</p>
+                        <p>όπου \(\mu_0 = 4\pi \times 10^{-7}\) H/m</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Δύναμη σε Κινούμενο Φορτίο</h3>
+                        <p>Δύναμη Lorentz:</p>
+                        <p>\[\vec{F} = q(\vec{u} \times \vec{B})\]</p>
+                        <p>Ένα στατικό φορτίο δεν δέχεται μαγνητική δύναμη</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Δύναμη μεταξύ Αγωγών</h3>
+                        <p>Δύναμη ανά μονάδα μήκους μεταξύ παράλληλων αγωγών:</p>
+                        <p>\[\frac{F}{L} = \frac{\mu_0 I_1 I_2}{2\pi h}\]</p>
+                        <p>Ελκτική αν τα ρεύματα είναι ομόρροπα, απωστική αν αντίρροπα</p>
+                    </div>
+                </div>
+
+                <div class="calculator-section">
+                    <h3>Αριθμομηχανή Μαγνητικής Δύναμης</h3>
+                    <div class="magnetic-force-calculator">
+                        <div class="form-group">
+                            <label>Φορτίο q (C):</label>
+                            <input type="number" id="charge" value="1e-6" step="any">
+                        </div>
+                        <div class="form-group">
+                            <label>Ταχύτητα v (m/s):</label>
+                            <input type="number" id="velocity" value="1000" step="any">
+                        </div>
+                        <div class="form-group">
+                            <label>Μαγνητικό πεδίο B (T):</label>
+                            <input type="number" id="magneticField" value="0.1" step="any">
+                        </div>
+                        <div class="form-group">
+                            <label>Γωνία θ (°):</label>
+                            <input type="number" id="angle" value="90" step="any">
+                        </div>
+                        <button onclick="calculateMagneticForce()" class="btn btn--primary">Υπολόγισε Δύναμη</button>
+                        <div id="magneticForceResult"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Νόμος του Ampère</h3>
+                        <p>Ολοκληρωτική μορφή:</p>
+                        <p>\[\oint \vec{B} \cdot d\vec{l} = \mu_0 I_{εσώκλειστο}\]</p>
+                        
+                        <p>Διαφορική μορφή:</p>
+                        <p>\[\nabla \times \vec{H} = \vec{J}\]</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Μαγνητική Ροή</h3>
+                        <p>Ορισμός:</p>
+                        <p>\[\Phi_B = \int\int \vec{B} \cdot d\vec{S}\]</p>
+                        
+                        <p>Νόμος Gauss για μαγνητισμό:</p>
+                        <p>\[\oint \vec{B} \cdot d\vec{S} = 0\]</p>
+                        <p>Διαφορική μορφή: \(\nabla \cdot \vec{B} = 0\)</p>
+                        <p>Δεν υπάρχουν μαγνητικοί μονόπολοι</p>
+                    </div>
+                </div>
+
+                <div class="visualization">
+                    <h3>Οπτικοποίηση Μαγνητικού Πεδίου</h3>
+                    <canvas id="magneticFieldCanvas" width="500" height="400"></canvas>
+                    <div class="controls">
+                        <label>Ρεύμα (A):</label>
+                        <input type="range" id="currentSlider" min="0" max="10" value="5" step="1">
+                        <span id="currentValue">5</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Διανυσματικό Μαγνητικό Δυναμικό</h3>
+                        <p>Ορισμός:</p>
+                        <p>\[\vec{B} = \nabla \times \vec{A}\]</p>
+                        
+                        <p>Ιδιότητες:</p>
+                        <p>\[\nabla \cdot \vec{A} = 0\]</p>
+                        <p>\[\nabla^2 \vec{A} = -\mu \vec{J}\]</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Maxwell Section -->
+        <section id="maxwell" class="content-section">
+            <div class="container">
+                <h1>Εξισώσεις του Maxwell</h1>
+                
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Ολοκληρωτική Μορφή</h3>
+                        <div class="maxwell-equations">
+                            <p><strong>Νόμος Gauss (Ηλεκτρισμός):</strong></p>
+                            <p>\[\oint \vec{E} \cdot d\vec{S} = \frac{Q}{\varepsilon_0}\]</p>
+                            
+                            <p><strong>Νόμος Gauss (Μαγνητισμός):</strong></p>
+                            <p>\[\oint \vec{B} \cdot d\vec{S} = 0\]</p>
+                            
+                            <p><strong>Νόμος Faraday:</strong></p>
+                            <p>\[\oint \vec{E} \cdot d\vec{l} = -\frac{d\Phi_B}{dt}\]</p>
+                            
+                            <p><strong>Νόμος Ampère-Maxwell:</strong></p>
+                            <p>\[\oint \vec{H} \cdot d\vec{l} = I + \frac{d\Phi_D}{dt}\]</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Διαφορική Μορφή</h3>
+                        <div class="maxwell-equations">
+                            <p>\[\nabla \cdot \vec{D} = \rho\]</p>
+                            <p>\[\nabla \cdot \vec{B} = 0\]</p>
+                            <p>\[\nabla \times \vec{E} = -\frac{\partial \vec{B}}{\partial t}\]</p>
+                            <p>\[\nabla \times \vec{H} = \vec{J} + \frac{\partial \vec{D}}{\partial t}\]</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Σημασία των Εξισώσεων Maxwell</h3>
+                        <ul>
+                            <li>Ενοποίηση ηλεκτρισμού και μαγνητισμού</li>
+                            <li>Πρόβλεψη ηλεκτρομαγνητικών κυμάτων</li>
+                            <li>Σύνδεση του φωτός με ηλεκτρομαγνητισμό</li>
+                            <li>Θεμέλια για την ηλεκτρονική και τις τηλεπικοινωνίες</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Ρεύμα Μετατόπισης</h3>
+                        <p>Η προσθήκη του Maxwell στον νόμο Ampère:</p>
+                        <p>\[I_d = \frac{d\Phi_D}{dt} = \varepsilon_0 \frac{d\Phi_E}{dt}\]</p>
+                        <p>Επιτρέπει την δημιουργία μαγνητικού πεδίου από μεταβαλλόμενο ηλεκτρικό πεδίο</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Συμμετρία στον Ηλεκτρομαγνητισμό</h3>
+                        <p>Μεταβαλλόμενο μαγνητικό πεδίο → Ηλεκτρικό πεδίο (Faraday)</p>
+                        <p>Μεταβαλλόμενο ηλεκτρικό πεδίο → Μαγνητικό πεδίο (Maxwell)</p>
+                        <p>Αυτή η συμμετρία οδηγεί στα ηλεκτρομαγνητικά κύματα</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Εξίσωση Κύματος</h3>
+                        <p>Από τις εξισώσεις Maxwell προκύπτει:</p>
+                        <p>\[\nabla^2 \vec{E} = \frac{1}{c^2} \frac{\partial^2 \vec{E}}{\partial t^2}\]</p>
+                        <p>\[\nabla^2 \vec{B} = \frac{1}{c^2} \frac{\partial^2 \vec{B}}{\partial t^2}\]</p>
+                        <p>όπου \(c = \frac{1}{\sqrt{\mu_0\varepsilon_0}} = 3 \times 10^8\) m/s</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Waves Section -->
+        <section id="waves" class="content-section">
+            <div class="container">
+                <h1>Ηλεκτρομαγνητικά Κύματα</h1>
+                
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Φύση των Ηλεκτρομαγνητικών Κυμάτων</h3>
+                        <p>Συγχρονισμένες ταλαντώσεις ηλεκτρικού και μαγνητικού πεδίου που:</p>
+                        <ul>
+                            <li>Είναι κάθετα μεταξύ τους</li>
+                            <li>Είναι κάθετα στη διεύθυνση διάδοσης</li>
+                            <li>Διαδίδονται με ταχύτητα φωτός</li>
+                            <li>Μεταφέρουν ενέργεια και ορμή</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Αρμονικά Κύματα</h3>
+                        <p>Λύσεις της εξίσωσης κύματος:</p>
+                        <p>\[\vec{E}(\vec{r}, t) = \vec{E}_0 \cos(\vec{k} \cdot \vec{r} - \omega t + \phi)\]</p>
+                        <p>\[\vec{B}(\vec{r}, t) = \vec{B}_0 \cos(\vec{k} \cdot \vec{r} - \omega t + \phi)\]</p>
+                        
+                        <p>Σχέση πλάτους: \(\frac{E_0}{B_0} = c\)</p>
+                        <p>Διασπορά: \(c = \lambda f\)</p>
+                        <p>Κυματοδιάνυσμα: \(k = \frac{2\pi}{\lambda}\)</p>
+                        <p>Γωνιακή συχνότητα: \(\omega = 2\pi f\)</p>
+                    </div>
+                </div>
+
+                <div class="wave-animation">
+                    <h3>Κίνηση Ηλεκτρομαγνητικού Κύματος</h3>
+                    <canvas id="waveCanvas" width="600" height="300"></canvas>
+                    <div class="controls">
+                        <label>Συχνότητα:</label>
+                        <input type="range" id="frequencySlider" min="0.1" max="2" value="1" step="0.1">
+                        <span id="frequencyValue">1</span> Hz
+                        <button id="playPauseBtn" onclick="toggleWaveAnimation()">Παύση</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Πόλωση</h3>
+                        
+                        <h4>Γραμμική Πόλωση</h4>
+                        <p>Το ηλεκτρικό πεδίο ταλαντώνεται σε σταθερό επίπεδο</p>
+                        
+                        <h4>Κυκλική Πόλωση</h4>
+                        <p>Το ηλεκτρικό πεδίο περιστρέφεται σχηματίζοντας κύκλο</p>
+                        
+                        <h4>Ελλειπτική Πόλωση</h4>
+                        <p>Το ηλεκτρικό πεδίο περιστρέφεται σχηματίζοντας έλλειψη</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Ηλεκτρομαγνητικό Φάσμα</h3>
+                        <div class="spectrum-info">
+                            <p><strong>Ραδιοκύματα:</strong> λ > 1 m</p>
+                            <p><strong>Μικροκύματα:</strong> 1 mm - 1 m</p>
+                            <p><strong>Υπέρυθρο:</strong> 0.7 μm - 1 mm</p>
+                            <p><strong>Ορατό φως:</strong> 380 - 700 nm</p>
+                            <p><strong>Υπεριώδες:</strong> 10 - 380 nm</p>
+                            <p><strong>Ακτίνες X:</strong> 0.01 - 10 nm</p>
+                            <p><strong>Ακτίνες γ:</strong> λ < 0.01 nm</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calculator-section">
+                    <h3>Αριθμομηχανή Κυμάτων</h3>
+                    <div class="wave-calculator">
+                        <div class="form-group">
+                            <label>Συχνότητα f (Hz):</label>
+                            <input type="number" id="waveFrequency" value="1e9" step="any">
+                        </div>
+                        <button onclick="calculateWaveProperties()" class="btn btn--primary">Υπολόγισε</button>
+                        <div id="waveResult"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Παραγωγή Ηλεκτρομαγνητικών Κυμάτων</h3>
+                        <p>Πείραμα Hertz με κύκλωμα LC:</p>
+                        <ul>
+                            <li>Ο πυκνωτής αποθηκεύει ενέργεια στο ηλεκτρικό πεδίο</li>
+                            <li>Το πηνίο αποθηκεύει ενέργεια στο μαγνητικό πεδίο</li>
+                            <li>Η ενέργεια ταλαντώνεται με συχνότητα \(f = \frac{1}{2\pi\sqrt{LC}}\)</li>
+                            <li>Οι επιταχυνόμενες κινήσεις των φορτίων παράγουν κύματα</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Energy Section -->
+        <section id="energy" class="content-section">
+            <div class="container">
+                <h1>Ενέργεια και Φωτόνια</h1>
+                
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Διάνυσμα Poynting</h3>
+                        <p>Το διάνυσμα Poynting περιγράφει τη ροή ηλεκτρομαγνητικής ενέργειας:</p>
+                        <p>\[\vec{S} = \frac{1}{\mu_0} (\vec{E} \times \vec{B})\]</p>
+                        
+                        <p>Κατεύθυνση: Κάθετη στα E και B, παράλληλη με τη διάδοση</p>
+                        <p>Μέγεθος: Ισχύς ανά μονάδα επιφάνειας (W/m²)</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Ένταση Κύματος</h3>
+                        <p>Η μέση ένταση ενός αρμονικού κύματος:</p>
+                        <p>\[I = \langle S \rangle = \frac{1}{2}\varepsilon_0 c E_0^2 = \frac{1}{2}\frac{B_0^2}{\mu_0}c = \frac{E_0 B_0}{2\mu_0}\]</p>
+                        
+                        <p>Για σφαιρική διάδοση:</p>
+                        <p>\[I = \frac{P_{μέση}}{4\pi r^2}\]</p>
+                        <p>Η ένταση μειώνεται με \(1/r^2\)</p>
+                    </div>
+                </div>
+
+                <div class="calculator-section">
+                    <h3>Αριθμομηχανή Διανύσματος Poynting</h3>
+                    <div class="poynting-calculator">
+                        <div class="form-group">
+                            <label>Ηλεκτρικό πεδίο E₀ (V/m):</label>
+                            <input type="number" id="electricField" value="100" step="any">
+                        </div>
+                        <div class="form-group">
+                            <label>Μαγνητικό πεδίο B₀ (T):</label>
+                            <input type="number" id="magneticFieldB" value="3.33e-7" step="any">
+                        </div>
+                        <button onclick="calculatePoynting()" class="btn btn--primary">Υπολόγισε Ένταση</button>
+                        <div id="poyntingResult"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Το Φως ως Σωματίδια - Φωτόνια</h3>
+                        <p>Υπόθεση Einstein (1905): Το φως αποτελείται από διακριτά σωματίδια (φωτόνια)</p>
+                        
+                        <p>Ενέργεια φωτονίου:</p>
+                        <p>\[E = hf = \frac{hc}{\lambda}\]</p>
+                        <p>όπου h = 6.626 × 10⁻³⁴ Js (σταθερά Planck)</p>
+                        
+                        <p>Ορμή φωτονίου:</p>
+                        <p>\[p = \frac{h}{\lambda} = \frac{E}{c}\]</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Φωτοηλεκτρικό Φαινόμενο</h3>
+                        <p>Εκπομπή ηλεκτρονίων από μέταλλο όταν το φωτίζουμε</p>
+                        
+                        <p><strong>Παρατηρήσεις:</strong></p>
+                        <ul>
+                            <li>Ο αριθμός ηλεκτρονίων εξαρτάται από την ένταση του φωτός</li>
+                            <li>Η εκπομπή εξαρτάται από τη συχνότητα (μήκος κύματος)</li>
+                            <li>Υπάρχει κατώφλι συχνότητας για εκπομπή</li>
+                        </ul>
+                        
+                        <p>Ενέργεια κατωφλίου: \(E_{κατώφλι} = hf_{min}\)</p>
+                    </div>
+                </div>
+
+                <div class="calculator-section">
+                    <h3>Αριθμομηχανή Φωτονίων</h3>
+                    <div class="photon-calculator">
+                        <div class="form-group">
+                            <label>Μήκος κύματος λ (nm):</label>
+                            <input type="number" id="wavelength" value="500" step="any">
+                        </div>
+                        <button onclick="calculatePhoton()" class="btn btn--primary">Υπολόγισε Ενέργεια Φωτονίου</button>
+                        <div id="photonResult"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Ενέργεια, Ορμή και Στροφορμή</h3>
+                        
+                        <p><strong>Ενέργεια:</strong> Τα ηλεκτρομαγνητικά κύματα μεταφέρουν ενέργεια</p>
+                        <p><strong>Ορμή:</strong> p = E/c - Πίεση ακτινοβολίας</p>
+                        <p><strong>Στροφορμή:</strong> Σχετίζεται με την πόλωση του φωτός</p>
+                        
+                        <p>Συνολική ενέργεια σήματος:</p>
+                        <p>\[E_{συνολική} = N_{φωτόνια} \times hf\]</p>
+                        <p>Ενίσχυση σήματος = αύξηση αριθμού φωτονίων</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Κυματοσωματιδιακή Διττότητα</h3>
+                        <p>Το φως εμφανίζει τόσο κυματικές όσο και σωματιδιακές ιδιότητες:</p>
+                        
+                        <p><strong>Κυματικές ιδιότητες:</strong></p>
+                        <ul>
+                            <li>Συμβολή</li>
+                            <li>Περίθλαση</li>
+                            <li>Πόλωση</li>
+                        </ul>
+                        
+                        <p><strong>Σωματιδιακές ιδιότητες:</strong></p>
+                        <ul>
+                            <li>Φωτοηλεκτρικό φαινόμενο</li>
+                            <li>Φαινόμενο Compton</li>
+                            <li>Πίεση ακτινοβολίας</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section id="quiz" class="content-section">
+            <div class="container">
+                <h1>Ερωτήσεις Αξιολόγησης</h1>
+                
+                <div class="quiz-container">
+                    <div class="quiz-question" id="question1">
+                        <h3>Ερώτηση 1</h3>
+                        <p>Πώς υπολογίζεται το συνολικό φορτίο Q για μη-ομοιόμορφη γραμμική κατανομή φορτίου λ;</p>
+                        <div class="quiz-options">
+                            <label><input type="radio" name="q1" value="0"> Q = λl</label>
+                            <label><input type="radio" name="q1" value="1"> Q = ∫λdl</label>
+                            <label><input type="radio" name="q1" value="2"> Q = λ/l</label>
+                            <label><input type="radio" name="q1" value="3"> Q = dλ/dl</label>
+                        </div>
+                        <div class="quiz-explanation" id="explanation1"></div>
+                    </div>
+
+                    <div class="quiz-question" id="question2">
+                        <h3>Ερώτηση 2</h3>
+                        <p>Ποια είναι η κύρια διαφορά μεταξύ ηλεκτρικού και μαγνητικού πεδίου ως προς τις πηγές τους;</p>
+                        <div class="quiz-options">
+                            <label><input type="radio" name="q2" value="0"> Δεν υπάρχει διαφορά</label>
+                            <label><input type="radio" name="q2" value="1"> Το ηλεκτρικό παράγεται από στατικά φορτία, το μαγνητικό από κινούμενα</label>
+                            <label><input type="radio" name="q2" value="2"> Το μαγνητικό παράγεται από στατικά φορτία</label>
+                            <label><input type="radio" name="q2" value="3"> Και τα δύο παράγονται από την ίδια πηγή</label>
+                        </div>
+                        <div class="quiz-explanation" id="explanation2"></div>
+                    </div>
+
+                    <div class="quiz-question" id="question3">
+                        <h3>Ερώτηση 3</h3>
+                        <p>Γιατί ένα στατικό φορτίο δεν δέχεται μαγνητική δύναμη σε στατικό μαγνητικό πεδίο;</p>
+                        <div class="quiz-options">
+                            <label><input type="radio" name="q3" value="0"> Επειδή το μαγνητικό πεδίο είναι αδύναμο</label>
+                            <label><input type="radio" name="q3" value="1"> Επειδή η δύναμη Lorentz απαιτεί κίνηση (F = q(u × B))</label>
+                            <label><input type="radio" name="q3" value="2"> Επειδή το φορτίο είναι μικρό</label>
+                            <label><input type="radio" name="q3" value="3"> Επειδή το μαγνητικό πεδίο είναι κάθετο</label>
+                        </div>
+                        <div class="quiz-explanation" id="explanation3"></div>
+                    </div>
+
+                    <div class="quiz-question" id="question4">
+                        <h3>Ερώτηση 4</h3>
+                        <p>Τι σημαίνει η μηδενική μαγνητική ροή μέσω κλειστής επιφάνειας;</p>
+                        <div class="quiz-options">
+                            <label><input type="radio" name="q4" value="0"> Ότι δεν υπάρχει μαγνητικό πεδίο</label>
+                            <label><input type="radio" name="q4" value="1"> Ότι δεν υπάρχουν μαγνητικοί μονόπολοι</label>
+                            <label><input type="radio" name="q4" value="2"> Ότι το μαγνητικό πεδίο είναι αδύναμο</label>
+                            <label><input type="radio" name="q4" value="3"> Ότι η επιφάνεια είναι μικρή</label>
+                        </div>
+                        <div class="quiz-explanation" id="explanation4"></div>
+                    </div>
+
+                    <div class="quiz-question" id="question5">
+                        <h3>Ερώτηση 5</h3>
+                        <p>Ποια είναι η σημασία του ρεύματος μετατόπισης του Maxwell;</p>
+                        <div class="quiz-options">
+                            <label><input type="radio" name="q5" value="0"> Επιτρέπει τη δημιουργία μαγνητικού πεδίου από μεταβαλλόμενο ηλεκτρικό</label>
+                            <label><input type="radio" name="q5" value="1"> Αυξάνει την ταχύτητα του φωτός</label>
+                            <label><input type="radio" name="q5" value="2"> Μειώνει την αντίσταση</label>
+                            <label><input type="radio" name="q5" value="3"> Δημιουργεί στατικά πεδία</label>
+                        </div>
+                        <div class="quiz-explanation" id="explanation5"></div>
+                    </div>
+
+                    <div class="quiz-controls">
+                        <button onclick="checkAnswers()" class="btn btn--primary">Έλεγχος Απαντήσεων</button>
+                        <button onclick="resetQuiz()" class="btn btn--secondary">Επαναφορά</button>
+                    </div>
+
+                    <div id="quizResults"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
