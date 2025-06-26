@@ -1,0 +1,671 @@
+/* Digital Electronics Learning Platform - Responsive Styles */
+
+/* Mobile First Approach - Base styles for mobile */
+
+/* Large Desktop Screens (1200px and up) */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1400px;
+    }
+    
+    .flip-flop-layout {
+        grid-template-columns: 1fr 1.2fr;
+    }
+    
+    .content-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Desktop Screens (992px and up) */
+@media (min-width: 992px) {
+    .header-content {
+        gap: var(--spacing-2xl);
+    }
+    
+    .main-nav ul {
+        gap: var(--spacing-xl);
+    }
+    
+    .learning-path {
+        flex-wrap: nowrap;
+    }
+    
+    .counter-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .exercises-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Tablet Screens (768px and up) */
+@media (min-width: 768px) {
+    .section-header h2 {
+        font-size: var(--font-size-4xl);
+    }
+    
+    .flip-flop-layout {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .register-controls {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .binary-display {
+        flex-direction: row;
+        gap: var(--spacing-lg);
+    }
+    
+    .counter-controls {
+        flex-direction: row;
+    }
+    
+    .modal-content {
+        width: 80%;
+        max-width: 700px;
+    }
+}
+
+/* Small Tablet and Large Mobile (576px and up) */
+@media (min-width: 576px) {
+    .container {
+        padding: 0 var(--spacing-xl);
+    }
+    
+    .header-content {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    .logo {
+        flex-direction: row;
+    }
+    
+    .main-nav {
+        display: block;
+    }
+    
+    .glossary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .register-bits {
+        gap: var(--spacing-md);
+    }
+    
+    .bit-cell {
+        width: 70px;
+        height: 70px;
+        font-size: var(--font-size-2xl);
+    }
+}
+
+/* Mobile Screens (up to 575px) */
+@media (max-width: 575px) {
+    /* Typography adjustments for mobile */
+    :root {
+        --font-size-3xl: 1.5rem;
+        --font-size-4xl: 1.75rem;
+        --spacing-xl: 1.5rem;
+        --spacing-2xl: 2rem;
+        --spacing-3xl: 2.5rem;
+    }
+    
+    .container {
+        padding: 0 var(--spacing-md);
+    }
+    
+    /* Header adjustments */
+    .header-content {
+        flex-direction: column;
+        gap: var(--spacing-lg);
+        padding: var(--spacing-md) 0;
+    }
+    
+    .logo {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-sm);
+    }
+    
+    .logo h1 {
+        font-size: var(--font-size-lg);
+    }
+    
+    .logo .subtitle {
+        font-size: var(--font-size-xs);
+    }
+    
+    /* Navigation for mobile */
+    .main-nav {
+        width: 100%;
+        order: 3;
+    }
+    
+    .main-nav ul {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        width: 100%;
+    }
+    
+    .nav-link {
+        display: block;
+        text-align: center;
+        padding: var(--spacing-md);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        width: 100%;
+    }
+    
+    .header-controls {
+        order: 2;
+        gap: var(--spacing-sm);
+    }
+    
+    .progress-btn span {
+        display: none;
+    }
+    
+    /* Content adjustments */
+    .section-header {
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .section-header h2 {
+        font-size: var(--font-size-2xl);
+    }
+    
+    .section-description {
+        font-size: var(--font-size-base);
+    }
+    
+    .content-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .concept-card,
+    .exercise-card,
+    .counter-card {
+        padding: var(--spacing-lg);
+    }
+    
+    /* Learning path adjustments */
+    .interactive-intro {
+        padding: var(--spacing-lg);
+    }
+    
+    .learning-path {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    .path-step {
+        flex-direction: row;
+        text-align: left;
+        min-width: auto;
+        width: 100%;
+        padding: var(--spacing-md);
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: var(--radius-lg);
+    }
+    
+    .path-step:not(:last-child)::after {
+        display: none;
+    }
+    
+    .step-number {
+        flex-shrink: 0;
+        margin-bottom: 0;
+        margin-right: var(--spacing-md);
+        width: 40px;
+        height: 40px;
+        font-size: var(--font-size-base);
+    }
+    
+    /* Flip-flop section mobile */
+    .flip-flop-tabs {
+        flex-direction: column;
+    }
+    
+    .tab-btn {
+        padding: var(--spacing-md);
+        text-align: center;
+    }
+    
+    .flip-flop-layout {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+    }
+    
+    .truth-table-container,
+    .flip-flop-simulator {
+        padding: var(--spacing-md);
+    }
+    
+    .truth-table th,
+    .truth-table td {
+        padding: var(--spacing-sm);
+        font-size: var(--font-size-xs);
+    }
+    
+    .circuit-svg {
+        width: 100%;
+        height: auto;
+        max-width: 280px;
+    }
+    
+    .control-panel {
+        min-width: auto;
+        width: 100%;
+        padding: var(--spacing-md);
+    }
+    
+    .input-controls label {
+        padding: var(--spacing-md);
+        font-size: var(--font-size-sm);
+    }
+    
+    .clock-btn {
+        padding: var(--spacing-md);
+        font-size: var(--font-size-sm);
+    }
+    
+    /* Register section mobile */
+    .register-tabs {
+        flex-direction: column;
+    }
+    
+    .register-content {
+        padding: var(--spacing-lg);
+    }
+    
+    .register-simulator {
+        padding: var(--spacing-lg);
+    }
+    
+    .register-bits {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: var(--spacing-sm);
+    }
+    
+    .bit-cell {
+        width: 50px;
+        height: 50px;
+        font-size: var(--font-size-lg);
+    }
+    
+    .bit-cell::before {
+        top: -12px;
+        font-size: 10px;
+    }
+    
+    .register-controls {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+    }
+    
+    .binary-display {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-md);
+    }
+    
+    .binary-value {
+        font-size: var(--font-size-base);
+        min-width: auto;
+    }
+    
+    /* Counter section mobile */
+    .counter-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .counter-display {
+        height: 80px;
+        font-size: var(--font-size-2xl);
+    }
+    
+    .counter-controls {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .counter-btn {
+        padding: var(--spacing-md);
+        text-align: center;
+    }
+    
+    /* Exercise section mobile */
+    .exercises-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .exercise-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .question {
+        padding: var(--spacing-md);
+    }
+    
+    .options {
+        gap: var(--spacing-xs);
+    }
+    
+    .option {
+        padding: var(--spacing-md);
+        font-size: var(--font-size-sm);
+    }
+    
+    /* Modal adjustments */
+    .modal-content {
+        width: 95%;
+        max-height: 90vh;
+        margin: var(--spacing-md);
+    }
+    
+    .modal-header {
+        padding: var(--spacing-lg);
+    }
+    
+    .modal-header h3 {
+        font-size: var(--font-size-lg);
+    }
+    
+    .modal-body {
+        padding: var(--spacing-lg);
+        max-height: calc(90vh - 100px);
+    }
+    
+    /* Timing diagram mobile */
+    .timing-diagram {
+        padding: var(--spacing-md);
+    }
+    
+    .timing-canvas {
+        height: 150px;
+    }
+}
+
+/* Extra small mobile devices (up to 320px) */
+@media (max-width: 320px) {
+    .container {
+        padding: 0 var(--spacing-sm);
+    }
+    
+    .concept-card,
+    .exercise-card,
+    .counter-card {
+        padding: var(--spacing-md);
+    }
+    
+    .interactive-intro {
+        padding: var(--spacing-md);
+    }
+    
+    .bit-cell {
+        width: 40px;
+        height: 40px;
+        font-size: var(--font-size-base);
+    }
+    
+    .register-bits {
+        gap: 2px;
+    }
+    
+    .binary-display {
+        padding: var(--spacing-sm);
+    }
+    
+    .counter-display {
+        height: 60px;
+        font-size: var(--font-size-xl);
+    }
+    
+    .modal-content {
+        width: 98%;
+    }
+}
+
+/* Landscape orientation adjustments */
+@media (orientation: landscape) and (max-height: 500px) {
+    .header-content {
+        padding: var(--spacing-sm) 0;
+    }
+    
+    .main-content {
+        padding-top: var(--spacing-md);
+    }
+    
+    .section-header {
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .interactive-intro {
+        padding: var(--spacing-lg);
+    }
+    
+    .learning-path {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .path-step {
+        flex-direction: column;
+        text-align: center;
+        min-width: 100px;
+    }
+    
+    .step-number {
+        margin-right: 0;
+        margin-bottom: var(--spacing-sm);
+        width: 35px;
+        height: 35px;
+        font-size: var(--font-size-sm);
+    }
+    
+    .modal-content {
+        max-height: 85vh;
+    }
+}
+
+/* High resolution displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .circuit-svg {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+    
+    .bit-cell {
+        border-width: 1px;
+    }
+    
+    .truth-table th,
+    .truth-table td {
+        border-width: 1px;
+    }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .data-flow-arrow {
+        animation: none;
+    }
+    
+    .spinner {
+        animation: none;
+        border-top-color: var(--primary-color);
+    }
+    
+    .bit-cell.shifting {
+        animation: none;
+        background-color: var(--accent-color);
+    }
+    
+    .state-circle.next {
+        animation: none;
+    }
+}
+
+/* Dark theme specific responsive adjustments */
+@media (prefers-color-scheme: dark) {
+    [data-theme="dark"] .circuit-svg {
+        background-color: var(--dark-bg-secondary);
+    }
+    
+    [data-theme="dark"] .truth-table th {
+        background-color: var(--primary-dark);
+    }
+    
+    [data-theme="dark"] .counter-display {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+    }
+}
+
+/* Print styles for mobile */
+@media print {
+    .flip-flop-layout {
+        grid-template-columns: 1fr !important;
+        gap: var(--spacing-lg) !important;
+    }
+    
+    .register-bits {
+        flex-wrap: wrap !important;
+        gap: var(--spacing-sm) !important;
+    }
+    
+    .counter-container {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .exercises-container {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .content-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Touch-friendly adjustments */
+@media (pointer: coarse) {
+    .nav-link {
+        padding: var(--spacing-md) var(--spacing-lg);
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .tab-btn {
+        min-height: 48px;
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+    
+    .clock-btn {
+        min-height: 44px;
+        padding: var(--spacing-md) var(--spacing-xl);
+    }
+    
+    .counter-btn {
+        min-height: 44px;
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+    
+    .option {
+        min-height: 44px;
+        padding: var(--spacing-md) var(--spacing-lg);
+        display: flex;
+        align-items: center;
+    }
+    
+    .input-controls label {
+        min-height: 44px;
+        padding: var(--spacing-md);
+    }
+    
+    .glossary-item {
+        min-height: 44px;
+        padding: var(--spacing-md);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .bit-cell {
+        min-width: 50px;
+        min-height: 50px;
+    }
+}
+
+/* Accessibility improvements for small screens */
+@media (max-width: 575px) {
+    /* Ensure sufficient color contrast */
+    .nav-link.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .tab-btn.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    /* Larger focus indicators */
+    .nav-link:focus,
+    .tab-btn:focus,
+    .clock-btn:focus,
+    .counter-btn:focus {
+        outline: 3px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+    
+    /* Better spacing for readability */
+    .definition-item p,
+    .glossary-item p {
+        line-height: 1.6;
+    }
+    
+    .question p {
+        line-height: 1.5;
+        font-size: var(--font-size-base);
+    }
+}
+
+/* Foldable device support */
+@media (max-width: 280px) {
+    .logo h1 {
+        font-size: var(--font-size-base);
+    }
+    
+    .logo .subtitle {
+        display: none;
+    }
+    
+    .section-header h2 {
+        font-size: var(--font-size-xl);
+    }
+    
+    .bit-cell {
+        width: 35px;
+        height: 35px;
+        font-size: var(--font-size-sm);
+    }
+    
+    .register-bits {
+        gap: 1px;
+    }
+}
