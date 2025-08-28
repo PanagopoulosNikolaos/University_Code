@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>06_ElectronicsQuiz - Diode Applications (Rectifiers & Filters)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;max-width:980px;margin:18px auto;padding:12px;color:#222}
+    header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    h1{font-size:1.2rem;margin:0}
+    #progress{height:14px;background:#eee;border-radius:8px;overflow:hidden;margin:12px 0}
+    #progress > i{display:block;height:100%;background:#3b82f6;width:0%}
+    .question-card{border:1px solid #ddd;padding:16px;border-radius:8px;background:#fff}
+    .options{margin-top:12px;display:grid;grid-template-columns:1fr;gap:8px}
+    .opt{padding:10px;border-radius:6px;border:1px solid #ccc;cursor:pointer;background:#fafafa}
+    .opt.selected{border-color:#2563eb;background:#e6f0ff}
+    .opt.correct{border-color:#059669;background:#ecfdf5}
+    .opt.wrong{border-color:#dc2626;background:#fff1f2}
+    .controls{display:flex;gap:8px;justify-content:space-between;margin-top:14px}
+    .btn{padding:8px 12px;border-radius:6px;border:1px solid #888;background:#f3f4f6;cursor:pointer}
+    .btn.primary{background:#2563eb;color:#fff;border-color:#1e40af}
+    #explanation{margin-top:12px;padding:10px;border-left:4px solid #ddd;background:#fafafa;border-radius:4px}
+    #final{display:none;text-align:left;margin-top:20px}
+    canvas{border:1px solid #ddd;border-radius:4px;background:#fff;max-width:100%}
+    footer{margin-top:18px;font-size:0.9rem;color:#555}
+    .note{font-size:0.9rem;color:#444;margin-top:6px}
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Diode Applications — Rectifiers & Filters — Quiz</h1>
+    <div class="note">Based on ELECTRONICS/06_Efarmoges_Diodwn.pdf — English questions and explanations</div>
+  </header>
+
+  <div id="progress"><i id="progress-bar"></i></div>
+
+  <div id="quiz-area" class="question-card">
+    <div id="qnum"></div>
+    <div id="question-text" style="margin-top:8px"></div>
+
+    <div id="plot-area" style="margin-top:12px;display:none">
+      <canvas id="wave-plot" width="860" height="260"></canvas>
+    </div>
+
+    <div class="options" id="options"></div>
+
+    <div id="explanation" style="display:none"></div>
+
+    <div class="controls">
+      <div>
+        <button class="btn" id="prevBtn">Previous</button>
+        <button class="btn" id="nextBtn">Next</button>
+      </div>
+      <div>
+        <button class="btn" id="revealBtn">Reveal Answer</button>
+        <button class="btn primary" id="finishBtn">Finish</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="final" class="question-card">
+    <h2>Results</h2>
+    <div id="score"></div>
+    <div id="summary" style="margin-top:12px"></div>
+  </div>
+
+  <footer>
+    <div>UI and behavior modeled on MATHEMATICAL ANALYSIS/04_QizGame.html</div>
+  </footer>
+
+  <script>
+    // Questions covering rectification stages, half/full-wave, bridge, PIV, smoothing (C, L), stabilization, multipliers and fault detection.
+    const questions = [
+      { q: "What is the purpose of an AC-to-DC rectifier in a power supply?",
+        options: ["To increase AC frequency","To convert alternating current into pulsating direct current","To stabilize voltage without filtering","To measure AC amplitude"],
+        answer:1,
+        explanation:"A rectifier converts AC into pulsating DC as the first stage of a power supply." },
+
+      { q: "Which stage commonly follows rectification to reduce ripple?",
+        options: ["Oscillation","Smoothing (filtering)","Impedance matching","Rectification again"],
+        answer:1,
+        explanation:"A smoothing filter (capacitor/inductor or RC/LC) reduces ripple after rectification." },
+
+      { q: "Half-wave rectification removes which part of the input sinewave?",
+        options: ["Positive halves","Negative halves or positive halves depending on diode orientation","Both halves","Only DC component"],
+        answer:1,
+        explanation:"Half-wave rectification blocks one polarity, allowing only one half-cycle (positive or negative) to pass." },
+
+      { q: "For a sine input with peak Vp, the average DC for ideal half-wave rectification is approximately:",
+        options: ["0.637 × Vp","0.318 × Vp","Vp","2 × Vp"],
+        answer:1,
+        explanation:"Average (mean) value for half-wave rectified sine is Vdc = 0.318 × Vp." },
+
+      { q: "Full-wave rectification (with centre-tapped transformer and two diodes) compared with half-wave:",
+        options: ["Has same DC but more ripple","Provides roughly double the DC and lower ripple","Produces only negative pulses","Requires no transformer ever"],
+        answer:1,
+        explanation:"Full-wave gives higher DC (about double for same secondary amplitude) and lower ripple than half-wave." },
+
+      { q: "A bridge rectifier uses how many diodes for single-phase full-wave rectification?",
+        options: ["2 diodes","4 diodes","1 diode","6 diodes"],
+        answer:1,
+        explanation:"A full-wave bridge uses 4 diodes to rectify both halves without a center tap." },
+
+      { q: "What does PIV (Peak Inverse Voltage) describe for a diode in a rectifier?",
+        options: ["Maximum forward current","Maximum reverse voltage the diode must withstand","Maximum power dissipation","Thermal resistance"],
+        answer:1,
+        explanation:"PIV (or PRV) is the maximum reverse voltage a diode experiences; it must be rated above this." },
+
+      { q: "For a bridge rectifier delivering Vout(max), what is the PIV required for each diode approximately?",
+        options: ["Vout(max)","Vout(max) + 0.7 V","Vout(max) + 0.7 V (same as shown)","2 × Vout(max)"],
+        answer:2,
+        explanation:"In the slides they show PIV ≈ Vout(max) + 0.7 V for each diode in the bridge (considering two diode drops)." },
+
+      { q: "Which filter component chiefly smooths the rectified output by charging and discharging?",
+        options: ["Transformer","Capacitor","Inductor only","Resistor only"],
+        answer:1,
+        explanation:"A capacitor filter charges at peaks and discharges into the load between peaks, reducing ripple." },
+
+      { q: "In an RC smoothing stage, increasing the capacitance C results in:",
+        options: ["More ripple","Less ripple and better smoothing","Higher ripple frequency","Immediate shorting of supply"],
+        answer:1,
+        explanation:"Higher capacitance stores more charge, reducing ripple amplitude and improving smoothing." },
+
+      { q: "Which statement about capacitor charging in a rectifier filter is correct?",
+        options: ["Capacitor charges slowly over many cycles","Capacitor charges quickly at peaks and discharges between peaks through the load","Capacitor never charges","Capacitor only charges during negative half-cycles"],
+        answer:1,
+        explanation:"Capacitor charges near each peak and supplies load current between peaks until next charge." },
+
+      { q: "What is the ripple frequency for a full-wave rectifier supplied from a single-phase source with mains frequency f?",
+        options: ["f/2","f","2f","3f"],
+        answer:2,
+        explanation:"Full-wave rectification produces pulses at twice mains frequency (2f)." },
+
+      { q: "Which smoothing element provides better smoothing for large loads at the cost of size and weight?",
+        options: ["Small electrolytic capacitor","Inductor (choke) in series","No filter","Light bulb"],
+        answer:1,
+        explanation:"An inductor (choke) filter can give better smoothing for heavy loads but is bulky." },
+
+      { q: "What is the 'stabilization factor' (γ) used to describe in the slides?",
+        options: ["The ratio of ripple after filter to ripple before","The harmonic distortion","Power factor","Capacitance value"],
+        answer:0,
+        explanation:"γ expresses the effectiveness of stabilization: ΔVout/ΔV (the smaller, the better smoothing)." },
+
+      { q: "A voltage doubler using diodes and capacitors achieves approximately:",
+        options: ["Half the transformer secondary peak","The same as the secondary","About twice the peak of the secondary","Negative voltage only"],
+        answer:2,
+        explanation:"Charge pump voltage doublers stack capacitor voltages to produce ~2× the secondary peak." },
+
+      { q: "Why might a full-wave bridge have diodes with lower required PIV compared to a center-tap full-wave design?",
+        options: ["Because the bridge uses exotic diodes","Because the center-tap design exposes diodes to higher reverse voltages","Bridge diodes are mirrored","This is not true"],
+        answer:1,
+        explanation:"Bridge configuration tends to result in lower required PIV per diode for the same Vout compared to some center‑tap arrangements." },
+
+      { q: "When diagnosing a power supply that shows correct secondary AC but the DC after the filter is low (~63% of expected), this likely indicates:",
+        options: ["Shorted transformer primary","Open (failed) electrolytic filter capacitor","Faulty diodes in bridge causing short","Bad load resistor only"],
+        answer:1,
+        explanation:"If the DC equals the mean of an unfiltered rectified waveform (~63.6% of peak), the capacitor may be open (no filtering)." },
+
+      { q: "If a bridge rectifier secondary peak is 18 V and each diode drop is ~0.7 V, the DC peak after the bridge (unloaded) is approximately:",
+        options: ["18 V","16.6 V","9 V","36 V"],
+        answer:1,
+        explanation:"Vpeak_out ≈ Vsecondary_peak − 2×Vd = 18 − 1.4 = 16.6 V (two diode drops in series)." },
+
+      { q: "Which of these improves smoothing most for a given load current?",
+        options: ["Smaller capacitor","Larger capacitor and/or lower load current","Higher ripple frequency only","Removing the rectifier"],
+        answer:1,
+        explanation:"Increasing C and reducing load current reduces ripple; faster pulse rate (full-wave) also helps." },
+
+      { q: "What is the approximate DC average for ideal full-wave rectification (no filter) relative to peak Vp?",
+        options: ["0.318 × Vp","0.637 × Vp","1.0 × Vp","0.5 × Vp"],
+        answer:1,
+        explanation:"Average (mean) for full-wave rectified sine is Vdc = 0.637 × Vp." },
+
+      { q: "In a power supply fault detection procedure, which measurement is most useful to confirm the bridge output is present but filter missing?",
+        options: ["Measure DC across filter: shows mean of rectified if cap open","Measure primary current only","Measure ambient temperature","Measure LED color"],
+        answer:0,
+        explanation:"Measuring DC across filter showing unfiltered mean indicates the filter capacitor is likely open." },
+
+      { q: "A half-wave rectifier's PIV requirement on the diode is approximately:",
+        options: ["Vp","2 × Vp","Vp + 0.7 V","0.5 × Vp"],
+        answer:2,
+        explanation:"For many simple half-wave cases the diode must withstand roughly the transformer secondary peak Vp (plus margin/diode drop considerations)." },
+
+      { q: "Which topology gives the highest DC ripple frequency for single-phase inputs?",
+        options: ["Half-wave rectifier","Full-wave bridge","No rectifier","Voltage doubler"],
+        answer:1,
+        explanation:"Full-wave bridge doubles the ripple frequency (2f), reducing ripple for same filtering." },
+
+      { q: "When a smoothing capacitor discharges through RL between peaks, discharge time constant is approximately:",
+        options: ["R_L × C","R_source × C","1/(R_L × C)","R_L / C"],
+        answer:0,
+        explanation:"The capacitor discharges through the load, so time constant τ = R_L × C." },
+
+      { q: "Which symptom would suggest shorted diodes in a bridge?",
+        options: ["No AC at transformer secondary","Excessive heating or fuse blow and near-zero DC output","Very high DC with no ripple","Correct DC and ripple"],
+        answer:1,
+        explanation:"Shorted diodes can short the secondary leading to blown fuses, overheating and wrong/no DC output." },
+
+      { q: "What is an advantage of full-wave rectification using a bridge vs. center-tapped transformer?",
+        options: ["Requires center tap","Uses fewer diodes","No center-tap needed and uses full secondary amplitude","Produces half the DC"],
+        answer:2,
+        explanation:"Bridge rectifier uses entire secondary without requiring a center tap, at cost of two diode drops in series." },
+
+      { q: "A designer expects 10.57 V DC after a bridge and RC filter with Vm=16.6 V peak. The measurement is 10.5 V DC — what is the likely conclusion in the slides?",
+        options: ["Everything OK","Filter capacitor likely open (no filter action)","Transformer primary open","Load is shorted"],
+        answer:1,
+        explanation:"Slides show that if measured DC equals ~63.6% of the peak (10.57 V), capacitor may be open and not filtering." }
+    ];
+
+    let cur = 0;
+    const userAnswers = new Array(questions.length);
+
+    function updateProgress() {
+      const ratio = ((cur) / questions.length) * 100;
+      document.getElementById('progress-bar').style.width = ratio + '%';
+    }
+
+    function render() {
+      const q = questions[cur];
+      document.getElementById('qnum').innerText = `Question ${cur+1} / ${questions.length}`;
+      document.getElementById('question-text').innerHTML = q.q;
+      const opts = document.getElementById('options');
+      opts.innerHTML = '';
+      q.options.forEach((o, i) => {
+        const div = document.createElement('div');
+        div.className = 'opt';
+        div.innerText = o;
+        div.onclick = () => selectOption(i);
+        if (userAnswers[cur] !== undefined) {
+          div.classList.toggle('selected', userAnswers[cur]===i);
+          if (userAnswers[cur]===q.answer) div.classList.add('correct');
+          else if (i===userAnswers[cur]) div.classList.add('wrong');
+          if (i===q.answer) div.classList.add('correct');
+        }
+        opts.appendChild(div);
+      });
+
+      // explanation
+      const exp = document.getElementById('explanation');
+      exp.style.display = userAnswers[cur] === undefined ? 'none' : 'block';
+      exp.innerHTML = userAnswers[cur] === undefined ? '' : `<strong>Explanation:</strong> ${q.explanation}`;
+
+      // plot area setup for selected questions
+      const plotArea = document.getElementById('plot-area');
+      plotArea.style.display = q.plot ? 'block' : 'none';
+      if (q.plot) {
+        const c = document.getElementById('wave-plot');
+        c.width = Math.min(860, document.body.clientWidth - 60);
+        c.height = 260;
+        if (q.plot.type === 'half') drawRectified(c, 'half', q.plot.params);
+        if (q.plot.type === 'full') drawRectified(c, 'full', q.plot.params);
+        if (q.plot.type === 'bridge') drawRectified(c, 'bridge', q.plot.params);
+        if (q.plot.type === 'cap') drawCapacitor(c, q.plot.params);
+      }
+
+      updateProgress();
+      MathJax.typesetPromise();
+    }
+
+    function selectOption(i) {
+      userAnswers[cur] = i;
+      render();
+    }
+
+    document.getElementById('nextBtn').onclick = () => {
+      if (cur < questions.length - 1) { cur++; render(); }
+    };
+    document.getElementById('prevBtn').onclick = () => {
+      if (cur > 0) { cur--; render(); }
+    };
+    document.getElementById('revealBtn').onclick = () => {
+      userAnswers[cur] = questions[cur].answer;
+      render();
+    };
+    document.getElementById('finishBtn').onclick = finish;
+
+    function finish() {
+      let correct = 0;
+      questions.forEach((q,i) => { if (userAnswers[i] === q.answer) correct++; });
+      document.getElementById('quiz-area').style.display = 'none';
+      document.getElementById('final').style.display = 'block';
+      document.getElementById('score').innerHTML = `<strong>Score:</strong> ${correct} / ${questions.length} (${Math.round(correct/questions.length*100)}%)`;
+      const summary = document.getElementById('summary');
+      let html = '<ol>';
+      questions.forEach((q,i)=> {
+        const ok = userAnswers[i]===q.answer ? '✔' : '✖';
+        html += `<li><strong>${ok}</strong> ${q.q}<br><em>Your answer:</em> ${userAnswers[i]===undefined ? '—' : q.options[userAnswers[i]]} <br><em>Correct:</em> ${q.options[q.answer]}<br><em>Explanation:</em> ${q.explanation}</li><hr>`;
+      });
+      html += '</ol>';
+      summary.innerHTML = html;
+      window.scrollTo(0,0);
+    }
+
+    // Plotting helpers: draw rectified waveforms and capacitor smoothing (illustrative)
+    function drawAxes(ctx, padL, padT, w, h, xlabel, ylabel) {
+      ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+      ctx.strokeStyle = '#666'; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padL, padT);
+      ctx.lineTo(padL, padT + h);
+      ctx.lineTo(padL + w, padT + h);
+      ctx.stroke();
+      ctx.fillStyle = '#333'; ctx.font = '12px Arial';
+      ctx.fillText(xlabel, padL + w - 60, padT + h + 18);
+      ctx.fillText(ylabel, padL - 36, padT + 10);
+    }
+
+    function drawRectified(canvas, mode, params) {
+      const ctx = canvas.getContext('2d');
+      const padL = 40, padT = 20, w = canvas.width - 80, h = canvas.height - 80;
+      drawAxes(ctx, padL, padT, w, h, 'Time', 'Voltage');
+      const steps = 600;
+      ctx.strokeStyle = '#1e40af'; ctx.lineWidth = 2; ctx.beginPath();
+      for (let i=0;i<=steps;i++){
+        const t = i/steps * 2*Math.PI*2; // two cycles
+        const Vin = Math.sin(t);
+        let Vout = 0;
+        if (mode === 'half') Vout = Math.max(0, Vin);
+        if (mode === 'full') Vout = Math.abs(Vin);
+        if (mode === 'bridge') Vout = Math.abs(Vin); // visually same as full for waveform
+        const x = padL + (i/steps)*w;
+        const y = padT + h/2 - Vout * (h/2 - 10);
+        if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+      // if showing capacitor effect
+      if (params && params.showRipple) {
+        // simple smoothing overlay: charge near peaks, exponential discharge between peaks
+        ctx.strokeStyle = '#b45309'; ctx.lineWidth = 2; ctx.beginPath();
+        let chargedV = 1.0;
+        for (let i=0;i<=steps;i++){
+          const t = i/steps * 2*Math.PI*2;
+          const Vin = Math.abs(Math.sin(t));
+          const x = padL + (i/steps)*w;
+          // approximate charge at peaks
+          if (Vin > chargedV - 0.01) chargedV = Vin;
+          else {
+            // discharge: simple RC approximation
+            chargedV -= (1/(params.R*params.C)) * 0.01;
+            if (chargedV < 0) chargedV = 0;
+          }
+          const y = padT + h/2 - chargedV * (h/2 - 10);
+          if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        }
+        ctx.stroke();
+        ctx.fillStyle='#b45309'; ctx.font='12px Arial';
+        ctx.fillText('Smoothed (approx)', padL+6, padT+14);
+      }
+    }
+
+    function drawCapacitor(canvas, params) {
+      // reuse drawRectified with smoothing overlay
+      drawRectified(canvas, params.mode || 'full', {showRipple:true, R:params.R || 1000, C:params.C || 100e-6});
+    }
+
+    // For some questions enable plots
+    // attach plot flags to specific questions by index
+    // e.g., show half-wave at q0, full-wave at q5, capacitor smoothing at q9
+    // but we set in data: add plot entries to appropriate questions:
+    // (we'll add plot objects now)
+    (function attachPlots(){
+      // map by question text heuristics (safer than indices)
+      questions.forEach(q=>{
+        if (/Half-wave/i.test(q.q) || /half-wave rectification/i.test(q.q)) q.plot = {type:'half', params:{}};
+        if (/Full-wave/i.test(q.q) || /full-wave rectification/i.test(q.q)) q.plot = q.plot || {type:'full', params:{}};
+        if (/bridge/i.test(q.q)) q.plot = q.plot || {type:'bridge', params:{}};
+        if (/smoothing/i.test(q.q) || /capacitor/i.test(q.q) || /filter/i.test(q.q)) q.plot = q.plot || {type:'cap', params:{mode:'full', R:1000, C:100e-6}};
+      });
+    })();
+
+    // init
+    render();
+  </script>
+</body>
+</html>

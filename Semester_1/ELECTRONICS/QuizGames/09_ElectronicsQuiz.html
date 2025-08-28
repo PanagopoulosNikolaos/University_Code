@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>09_ElectronicsQuiz - Amplifiers with Transistor (DC/AC analysis)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;max-width:980px;margin:18px auto;padding:12px;color:#222}
+    header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    h1{font-size:1.2rem;margin:0}
+    #progress{height:14px;background:#eee;border-radius:8px;overflow:hidden;margin:12px 0}
+    #progress > i{display:block;height:100%;background:#3b82f6;width:0%}
+    .question-card{border:1px solid #ddd;padding:16px;border-radius:8px;background:#fff}
+    .options{margin-top:12px;display:grid;grid-template-columns:1fr;gap:8px}
+    .opt{padding:10px;border-radius:6px;border:1px solid #ccc;cursor:pointer;background:#fafafa}
+    .opt.selected{border-color:#2563eb;background:#e6f0ff}
+    .opt.correct{border-color:#059669;background:#ecfdf5}
+    .opt.wrong{border-color:#dc2626;background:#fff1f2}
+    .controls{display:flex;gap:8px;justify-content:space-between;margin-top:14px}
+    .btn{padding:8px 12px;border-radius:6px;border:1px solid #888;background:#f3f4f6;cursor:pointer}
+    .btn.primary{background:#2563eb;color:#fff;border-color:#1e40af}
+    #explanation{margin-top:12px;padding:10px;border-left:4px solid #ddd;background:#fafafa;border-radius:4px}
+    #final{display:none;text-align:left;margin-top:20px}
+    canvas{border:1px solid #ddd;border-radius:4px;background:#fff;max-width:100%}
+    footer{margin-top:18px;font-size:0.9rem;color:#555}
+    .note{font-size:0.9rem;color:#444;margin-top:6px}
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Amplifiers with Transistor — Quiz</h1>
+    <div class="note">Based on ELECTRONICS/09_Enisxytes_me_Transistor.pdf — English questions and explanations</div>
+  </header>
+
+  <div id="progress"><i id="progress-bar"></i></div>
+
+  <div id="quiz-area" class="question-card">
+    <div id="qnum"></div>
+    <div id="question-text" style="margin-top:8px"></div>
+
+    <div id="plot-area" style="margin-top:12px;display:none">
+      <canvas id="gm-plot" width="820" height="300"></canvas>
+    </div>
+
+    <div class="options" id="options"></div>
+
+    <div id="explanation" style="display:none"></div>
+
+    <div class="controls">
+      <div>
+        <button class="btn" id="prevBtn">Previous</button>
+        <button class="btn" id="nextBtn">Next</button>
+      </div>
+      <div>
+        <button class="btn" id="revealBtn">Reveal Answer</button>
+        <button class="btn primary" id="finishBtn">Finish</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="final" class="question-card">
+    <h2>Results</h2>
+    <div id="score"></div>
+    <div id="summary" style="margin-top:12px"></div>
+  </div>
+
+  <footer>
+    <div>UI and behavior modeled on MATHEMATICAL ANALYSIS/04_QizGame.html</div>
+  </footer>
+
+  <script>
+    // Questions covering small-signal amplifier implementation, DC analysis, AC analysis, gm, r'e, input/output impedances, coupling/bypass capacitors and methodology from the PDF.
+    const questions = [
+      { q: "What is the purpose of a coupling capacitor at the amplifier input?", options:["To pass DC only","To block DC and pass AC input signal","To increase DC bias","To short the input"], answer:1, explanation:"Input coupling capacitor blocks DC bias and passes the AC input to the amplifier." },
+
+      { q: "In DC analysis of an amplifier, capacitors are treated as:", options:["Short circuits","Open circuits","Voltage sources","Current sources"], answer:1, explanation:"For DC (steady) analysis capacitors are open circuits (they block DC)." },
+
+      { q: "To compute the small-signal transconductance g_m we use approximately g_m = I_C / V_T. What nominal value is used in slides for V_T?", options:["25 mV","0.7 V","1.2 V","250 mV"], answer:0, explanation:"Thermal voltage V_T ≈ 25 mV (at room temperature) is used in g_m ≈ I_C / V_T." },
+
+      { q: "What is r'_e (r_e small) in small-signal modelling?", options:["The output resistance", "Small-signal emitter resistance ≈ V_T / I_E", "Capacitance of emitter", "Collector-emitter breakdown voltage"], answer:1, explanation:"r'_e is the intrinsic emitter resistance for small-signal ≈ V_T / I_E." },
+
+      { q: "Which step belongs to the DC analysis procedure for an amplifier in the slides?", options:["Short all DC sources","Short all capacitors","Draw DC equivalent (caps open) and find I_E","Compute AC gains first"], answer:2, explanation:"DC analysis: draw DC equivalent (capacitors open) and compute DC currents (I_E etc.)." },
+
+      { q: "What is the small-signal input resistance seen at the base roughly equal to (slides)?", options:["β·(r'_e + R_E)","R_C only","VCC","R1||R2 only"], answer:0, explanation:"Z_in(base) ≈ β·(r'_e + R_E) when emitter resistance is present (multiplied by β)." },
+
+      { q: "When a bypass capacitor is placed in parallel with emitter resistor R_E, its AC effect is to:", options:["Open R_E in AC", "Short R_E at AC frequencies, increasing gain", "Remove collector resistor", "Increase DC bias"], answer:1, explanation:"A bypass capacitor shorts R_E for AC, reducing emitter degeneration and increasing gain." },
+
+      { q: "Which model is commonly used for AC small-signal BJT analysis in the notes?", options:["T or Π hybrid models","Full semiconductor band model","Mechanical model","Quantum model"], answer:0, explanation:"The T and Π small-signal equivalent models are used for AC analysis." },
+
+      { q: "If collector resistor R_C is in parallel with load R_L, the effective r_C used in gain formulas is:", options:["R_C + R_L","R_C || R_L","R_C - R_L","R_C only always"], answer:1, explanation:"Effective output resistance r_C = R_C || R_L (parallel combination)." },
+
+      { q: "Voltage gain A_v for a common-emitter stage (with bypassed R_E) is approximately:", options:["r_C / (r'_e + R_E)","r_C / r'_e","r'_e / r_C","β × r_C"], answer:1, explanation:"With emitter bypassed, denominator is ≈ r'_e so A_v ≈ r_C / r'_e." },
+
+      { q: "To compute r'_e from DC currents the slides recommend using:", options:["r'_e = V_T / I_E","r'_e = I_E / V_T","r'_e = β / I_C","r'_e = VCC / R"], answer:0, explanation:"r'_e ≈ V_T / I_E (where V_T ≈ 25 mV)." },
+
+      { q: "What does g_m represent in small-signal amplifier analysis?", options:["Conductance small-signal = dI_C / dV_BE","Capacitance","Load resistance","DC supply"], answer:0, explanation:"g_m = ∂I_C/∂V_BE (small-signal transconductance) ≈ I_C / V_T." },
+
+      { q: "Which of the following is used to compute the stage input voltage when a source resistor Rg is present?", options:["Voltage divider between Rg and Z_in(stage)","Sum of Rg and Z_in","Only Z_in","Only Rg"], answer:0, explanation:"Input is Vg * Z_in/(Rg+Z_in) — a divider between source resistor and stage input impedance." },
+
+      { q: "Which of these is true about DC and AC equivalent circuits?", options:["DC: capacitors open; AC: caps short (for midband)", "DC: caps short; AC: caps open", "Both same", "Neither uses caps"], answer:0, explanation:"DC analysis: capacitors open. AC midband: coupling/bypass caps treated as shorts." },
+
+      { q: "What is the recommended order in generalized methodology for amplifier design in slides?", options:["AC then DC", "DC analysis then AC analysis", "Only DC", "Only AC"], answer:1, explanation:"Slides recommend DC analysis first (find bias), then AC small-signal analysis." },
+
+      { q: "If the emitter current I_E increases, what happens to r'_e?", options:["r'_e decreases (since r'_e ≈ V_T / I_E)","r'_e increases","r'_e unchanged","r'_e becomes infinite"], answer:0, explanation:"r'_e ∝ 1/I_E, so as I_E increases r'_e decreases." },
+
+      { q: "Which quantity is proportional to gain when r'_e is small?", options:["Voltage gain increases as r'_e decreases","Voltage gain decreases","Gain independent","Gain becomes negative always"], answer:0, explanation:"A_v ≈ r_C / r'_e, so smaller r'_e -> larger magnitude gain." },
+
+      { q: "When forming AC equivalent according to Π-model, resistances in emitter branch appear in input multiplied by:", options:["1","β","0.5","1/β"], answer:1, explanation:"Emitter resistances appear multiplied by β when reflected to base in Π-model." },
+
+      { q: "Which step must you do before AC analysis according to slides?", options:["Short DC supplies and short capacitors to ground where applicable","Open all supplies","Remove resistors","Change β"], answer:0, explanation:"For AC small-signal analysis you ground DC sources and replace bypass/coupling caps by shorts (for midband)." },
+
+      { q: "What is the typical numeric value used in slides for thermal voltage V_T?", options:["25 mV","0.025 V","Both are same","None"], answer:2, explanation:"V_T ≈ 25 mV which is 0.025 V (both representations equivalent)." },
+
+      { q: "Z_in(stage) often equals R1 || R2 || β·(r'_e + R_E). What is the consequence of choosing very large R1 and R2?", options:["Z_in becomes dominated by β·(r'_e + R_E) making loading sensitive to β","Z_in becomes infinite","Z_in equals zero","Z_in equals Rg"], answer:0, explanation:"If divider resistances are large, divider current small and Z_in is set by β·(r'_e+R_E), increasing sensitivity to β." },
+
+      { q: "Which element is removed when constructing DC equivalent used to compute I_E?", options:["Coupling capacitors (open)","Resistors","Transistors","Power supply"], answer:0, explanation:"Coupling and bypass capacitors are open in the DC equivalent; they no longer pass current." },
+
+      { q: "In AC analysis, a bypass capacitor across R_E results in:", options:["Higher midband gain compared to unbypassed case","Lower midband gain","No effect","Eliminates output"], answer:0, explanation:"Bypassing R_E for AC removes emitter degeneration and increases midband gain." },
+
+      { q: "What small-signal parameter must be kept approximately constant to use constant g_m in formulas?", options:["I_C (DC)", "VCC", "R_C", "R1"], answer:0, explanation:"g_m depends on I_C; if I_C is stable, g_m can be treated as constant for small-signal analysis." },
+
+      { q: "Which method computes r'_e directly from measured DC emitter current?", options:["r'_e = V_T / I_E","r'_e = I_E / V_T","r'_e = β / I_C","r'_e = VCC / RC"], answer:0, explanation:"Use r'_e = V_T / I_E with V_T ≈ 25 mV." },
+
+      { q: "Which AC standard (T or Π) is more suited for common-base circuits according to slides?", options:["T","Π","Neither","Both equally"], answer:0, explanation:"The T-model is used more for common-base configurations per slides." },
+
+      { q: "What small-signal resistance r_C used in output is defined as in notes?", options:["r_C = R_C || R_L","r_C = R_C + R_L","r_C = R_C only","r_C = R_L only"], answer:0, explanation:"Output resistance r_C is the parallel of collector resistor and load (R_C || R_L)." },
+
+      { q: "Which plot is included in this quiz to illustrate g_m vs I_C (from PDF formulas)?", options:["g_m (S) vs I_C (mA)","Bode magnitude","Nyquist diagram","Only time-domain"], answer:0, explanation:"This quiz includes a gm vs IC plot (g_m ≈ I_C / V_T) to visualize how transconductance scales with bias current.", plot:{type:"gm_vs_ic", params:{Ic_max_mA:10}} }
+    ];
+
+    let cur = 0;
+    const userAnswers = new Array(questions.length);
+
+    function updateProgress() {
+      const ratio = ((cur) / questions.length) * 100;
+      document.getElementById('progress-bar').style.width = ratio + '%';
+    }
+
+    function render() {
+      const q = questions[cur];
+      document.getElementById('qnum').innerText = `Question ${cur+1} / ${questions.length}`;
+      document.getElementById('question-text').innerHTML = q.q;
+      const opts = document.getElementById('options');
+      opts.innerHTML = '';
+      q.options.forEach((o, i) => {
+        const div = document.createElement('div');
+        div.className = 'opt';
+        div.innerText = o;
+        div.onclick = () => selectOption(i);
+        if (userAnswers[cur] !== undefined) {
+          div.classList.toggle('selected', userAnswers[cur]===i);
+          if (userAnswers[cur]===q.answer) div.classList.add('correct');
+          else if (i===userAnswers[cur]) div.classList.add('wrong');
+          if (i===q.answer) div.classList.add('correct');
+        }
+        opts.appendChild(div);
+      });
+
+      const exp = document.getElementById('explanation');
+      exp.style.display = userAnswers[cur] === undefined ? 'none' : 'block';
+      exp.innerHTML = userAnswers[cur] === undefined ? '' : `<strong>Explanation:</strong> ${q.explanation}`;
+
+      const plotArea = document.getElementById('plot-area');
+      plotArea.style.display = q.plot ? 'block' : 'none';
+      if (q.plot) {
+        const c = document.getElementById('gm-plot');
+        c.width = Math.min(820, document.body.clientWidth - 60);
+        c.height = 300;
+        if (q.plot.type === 'gm_vs_ic') drawGmVsIc(c, q.plot.params);
+      }
+
+      updateProgress();
+      MathJax.typesetPromise();
+    }
+
+    function selectOption(i) {
+      userAnswers[cur] = i;
+      render();
+    }
+
+    document.getElementById('nextBtn').onclick = () => {
+      if (cur < questions.length - 1) { cur++; render(); }
+    };
+    document.getElementById('prevBtn').onclick = () => {
+      if (cur > 0) { cur--; render(); }
+    };
+    document.getElementById('revealBtn').onclick = () => {
+      userAnswers[cur] = questions[cur].answer;
+      render();
+    };
+    document.getElementById('finishBtn').onclick = finish;
+
+    function finish() {
+      let correct = 0;
+      questions.forEach((q,i) => { if (userAnswers[i] === q.answer) correct++; });
+      document.getElementById('quiz-area').style.display = 'none';
+      document.getElementById('final').style.display = 'block';
+      document.getElementById('score').innerHTML = `<strong>Score:</strong> ${correct} / ${questions.length} (${Math.round(correct/questions.length*100)}%)`;
+      const summary = document.getElementById('summary');
+      let html = '<ol>';
+      questions.forEach((q,i)=> {
+        const ok = userAnswers[i]===q.answer ? '✔' : '✖';
+        html += `<li><strong>${ok}</strong> ${q.q}<br><em>Your answer:</em> ${userAnswers[i]===undefined ? '—' : q.options[userAnswers[i]]} <br><em>Correct:</em> ${q.options[q.answer]}<br><em>Explanation:</em> ${q.explanation}</li><hr>`;
+      });
+      html += '</ol>';
+      summary.innerHTML = html;
+      window.scrollTo(0,0);
+    }
+
+    // Plot gm vs Ic: gm = Ic / Vt, with Vt=25mV
+    function drawAxes(ctx, padL, padT, w, h, xlab, ylab) {
+      ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+      ctx.strokeStyle = '#666'; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padL, padT);
+      ctx.lineTo(padL, padT + h);
+      ctx.lineTo(padL + w, padT + h);
+      ctx.stroke();
+      ctx.fillStyle = '#333'; ctx.font = '12px Arial';
+      ctx.fillText(xlab, padL + w - 80, padT + h + 18);
+      ctx.fillText(ylab, padL - 36, padT + 10);
+    }
+
+    function drawGmVsIc(canvas, params) {
+      const ctx = canvas.getContext('2d');
+      const padL = 60, padT = 30, w = canvas.width - 100, h = canvas.height - 90;
+      drawAxes(ctx, padL, padT, w, h, 'I_C (mA)', 'g_m (mS)');
+      const Vt = 0.025; // V
+      const IcMax = params.Ic_max_mA || 10;
+      ctx.strokeStyle = '#1e40af'; ctx.lineWidth = 2; ctx.beginPath();
+      for (let i=0;i<=200;i++){
+        const Ic_mA = (i/200) * IcMax;
+        const Ic_A = Ic_mA / 1000;
+        const gm_S = Ic_A / Vt; // Siemens
+        const gm_mS = gm_S * 1000;
+        const x = padL + (Ic_mA / IcMax) * w;
+        // map gm_mS to canvas vertical (choose scale)
+        const gmMax = (IcMax/1000)/Vt * 1000; // mS
+        const y = padT + h - (gm_mS / gmMax) * h;
+        if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+      // annotate axes ticks
+      ctx.fillStyle='#333'; ctx.font='11px Arial';
+      for (let t=0; t<=IcMax; t += Math.max(1, Math.round(IcMax/5))) {
+        const x = padL + (t / IcMax) * w;
+        ctx.fillText(`${t} mA`, x-10, padT + h + 32);
+      }
+      // label sample points
+      const sampleIc = [1, 5, 10];
+      ctx.fillStyle='#b45309';
+      sampleIc.forEach((mA, idx) => {
+        const x = padL + (mA / IcMax) * w;
+        const y = padT + h - (((mA/1000)/Vt*1000) / ((IcMax/1000)/Vt*1000)) * h;
+        ctx.beginPath(); ctx.arc(x,y,3,0,2*Math.PI); ctx.fill();
+        const gmVal = ((mA/1000)/Vt*1000).toFixed(2);
+        ctx.fillText(`${gmVal} mS @ ${mA} mA`, x+6, y-6);
+      });
+      ctx.fillStyle='#111'; ctx.font='12px Arial';
+      ctx.fillText('g_m ≈ I_C / V_T (V_T ≈ 25 mV)', padL+6, padT+14);
+    }
+
+    // attach plots to the corresponding question index by scanning
+    (function attachPlots(){
+      questions.forEach(q=>{
+        if (q.plot) return;
+        if (/g_m/i.test(q.q) || /gm/i.test(q.q) || /g_m/i.test(q.q)) q.plot = {type:'gm_vs_ic', params:{Ic_max_mA:10}};
+        if (/r'_e/i.test(q.q) || /r'_e/i.test(q.q)) q.plot = q.plot || {type:'gm_vs_ic', params:{Ic_max_mA:10}};
+      });
+    })();
+
+    // init
+    render();
+  </script>
+</body>
+</html>

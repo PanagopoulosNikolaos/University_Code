@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>05_ElectronicsQuiz - Special Diode Types</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;max-width:900px;margin:18px auto;padding:12px;color:#222}
+    header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    h1{font-size:1.2rem;margin:0}
+    #progress{height:14px;background:#eee;border-radius:8px;overflow:hidden;margin:12px 0}
+    #progress > i{display:block;height:100%;background:#3b82f6;width:0%}
+    .question-card{border:1px solid #ddd;padding:16px;border-radius:8px;background:#fff}
+    .options{margin-top:12px;display:grid;grid-template-columns:1fr;gap:8px}
+    .opt{padding:10px;border-radius:6px;border:1px solid #ccc;cursor:pointer;background:#fafafa}
+    .opt.selected{border-color:#2563eb;background:#e6f0ff}
+    .opt.correct{border-color:#059669;background:#ecfdf5}
+    .opt.wrong{border-color:#dc2626;background:#fff1f2}
+    .controls{display:flex;gap:8px;justify-content:space-between;margin-top:14px}
+    .btn{padding:8px 12px;border-radius:6px;border:1px solid #888;background:#f3f4f6;cursor:pointer}
+    .btn.primary{background:#2563eb;color:#fff;border-color:#1e40af}
+    #explanation{margin-top:12px;padding:10px;border-left:4px solid #ddd;background:#fafafa;border-radius:4px}
+    #final{display:none;text-align:center;margin-top:20px}
+    canvas{border:1px solid #ddd;border-radius:4px;background:#fff;max-width:100%}
+    footer{margin-top:18px;font-size:0.9rem;color:#555}
+    .note{font-size:0.9rem;color:#444;margin-top:6px}
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Special Diode Types — Quiz</h1>
+    <div class="note">Based on ELECTRONICS/05_Eidikoi_typoi_diodwn.pdf — English questions and explanations</div>
+  </header>
+
+  <div id="progress"><i id="progress-bar"></i></div>
+
+  <div id="quiz-area" class="question-card">
+    <div id="qnum"></div>
+    <div id="question-text" style="margin-top:8px"></div>
+
+    <div id="plot-area" style="margin-top:12px;display:none">
+      <canvas id="iv-plot" width="760" height="300"></canvas>
+    </div>
+
+    <div class="options" id="options"></div>
+
+    <div id="explanation" style="display:none"></div>
+
+    <div class="controls">
+      <div>
+        <button class="btn" id="prevBtn">Previous</button>
+        <button class="btn" id="nextBtn">Next</button>
+      </div>
+      <div>
+        <button class="btn" id="revealBtn">Reveal Answer</button>
+        <button class="btn primary" id="finishBtn">Finish</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="final" class="question-card">
+    <h2>Results</h2>
+    <div id="score"></div>
+    <div id="summary" style="margin-top:12px;text-align:left"></div>
+  </div>
+
+  <footer>
+    <div>UI and behavior modeled on MATHEMATICAL ANALYSIS/04_QizGame.html</div>
+  </footer>
+
+  <script>
+    // Questions covering Zener diodes, Schottky, LEDs, laser diodes, photodiodes, phototransistors, optocouplers, datasheet terms, protection resistor calculation, advantages/disadvantages, regulator types and performance metrics.
+    const questions = [
+      {
+        q: "What is the defining operating region of a Zener diode used as a voltage regulator?",
+        options: [
+          "Forward conduction region where current increases exponentially",
+          "Reverse breakdown region where voltage is approximately constant",
+          "Reverse leakage region with negligible current",
+          "Avalanche region used only for switching"
+        ],
+        answer: 1,
+        explanation: "Zener diodes are used in their reverse breakdown region (Zener region) where the voltage across the diode remains approximately constant (V_Z) over a range of currents.",
+      },
+
+      {
+        q: "Which parameter from a Zener diode datasheet gives the nominal stabilizing voltage?",
+        options: ["I_Zmax", "V_Z (Zener voltage)", "P_D (power dissipation)", "I_Zmin"],
+        answer: 1,
+        explanation: "V_Z is the rated Zener voltage—the nominal voltage the diode maintains in its breakdown region.",
+      },
+
+      {
+        q: "If a Zener diode has V_Z = 5.1 V and I_Zmax = 50 mA, what is the maximum power the diode can safely dissipate (approx)?",
+        options: ["0.255 W", "255 W", "10.2 W", "5.1 W"],
+        answer: 0,
+        explanation: "Power P_D = V_Z × I_Zmax = 5.1 V × 0.05 A = 0.255 W.",
+      },
+
+      {
+        q: "In a simple Zener voltage regulator using a series resistor R_S, which equation relates the input voltage V1, series resistor, Zener current and load current?",
+        options: [
+          "V1 = (I_Z + I_L) R_S + V_Z",
+          "V1 = I_L R_S + I_Z",
+          "V1 = V_Z / (I_Z + I_L)",
+          "V1 = (V_Z + R_S) I_L"
+        ],
+        answer: 0,
+        explanation: "The input divides: V1 = I1 R_S + V_Z where I1 = I_Z + I_L, so V1 = (I_Z + I_L) R_S + V_Z.",
+      },
+
+      {
+        q: "What is the purpose of a 'line regulator' using a Zener diode?",
+        options: [
+          "To keep output voltage stable when load changes but input fixed",
+          "To convert AC to DC",
+          "To keep output voltage stable when input voltage varies",
+          "To increase output current capability"
+        ],
+        answer: 2,
+        explanation: "A line regulator maintains the output voltage stable against variations of the supply (input) voltage while load current remains roughly constant.",
+      },
+
+      {
+        q: "What does the term 'load regulation' describe for a Zener stabilizer?",
+        options: [
+          "Change of Vout when input varies",
+          "Change of Vout when load current changes",
+          "Maximum allowable Zener current",
+          "Efficiency of the Zener device"
+        ],
+        answer: 1,
+        explanation: "Load regulation describes how much the output voltage changes due to variations in the load current.",
+      },
+
+      {
+        q: "Which of these is a practical requirement to ensure a Zener diode stays in its regulating range?",
+        options: [
+          "Ensure I_Z stays between I_Zmin and I_Zmax for expected load and input variations",
+          "Keep load current zero",
+          "Always operate the diode at maximum power rating",
+          "Use the diode only in forward bias"
+        ],
+        answer: 0,
+        explanation: "To maintain regulation the Zener current must remain within the datasheet limits (I_Zmin ≤ I_Z ≤ I_Zmax) for the expected conditions.",
+      },
+
+      {
+        q: "What characteristic distinguishes a Schottky diode from a typical p–n diode?",
+        options: [
+          "It uses a metal–semiconductor junction and has lower forward voltage and faster switching",
+          "It has a higher breakdown voltage than silicon p–n diodes",
+          "It emits light when forward biased",
+          "It only conducts in reverse direction"
+        ],
+        answer: 0,
+        explanation: "Schottky diodes have a metal–semiconductor junction, lower forward voltage drop and faster switching due to absence of minority-carrier storage.",
+      },
+
+      {
+        q: "Which application is Schottky diode especially useful for?",
+        options: [
+          "High-frequency switching and low forward-voltage rectification",
+          "High-voltage standoff in power supplies",
+          "Light emission (lighting)",
+          "Voltage reference in precision regulators"
+        ],
+        answer: 0,
+        explanation: "Schottky diodes are preferred in high-speed switching and for low-loss rectification because of their fast response and low V_forward.",
+      },
+
+      {
+        q: "What happens to an LED when reverse biased beyond its safe reverse voltage (typically >3 V)?",
+        options: [
+          "It emits brighter light",
+          "It may be damaged or destroyed",
+          "It becomes a photodiode and generates current",
+          "It becomes superconductive"
+        ],
+        answer: 1,
+        explanation: "LEDs are sensitive to reverse voltage; exceeding the safe reverse bias can damage the device.",
+      },
+
+      {
+        q: "Typical forward voltage range for common LEDs during normal operation is approximately:",
+        options: ["0.1–0.3 V", "1.5–2.5 V", "5–10 V", "10–20 V"],
+        answer: 1,
+        explanation: "Common LEDs usually operate with forward voltages around 1.5–2.5 V depending on color and semiconductor material.",
+      },
+
+      {
+        q: "What is the main purpose of a series 'current-limiting' resistor with an LED?",
+        options: [
+          "To limit the LED current so it is safe and provide desired brightness",
+          "To increase LED forward voltage",
+          "To change LED color",
+          "To allow the LED to operate from AC directly"
+        ],
+        answer: 0,
+        explanation: "The series resistor limits current through the LED, protecting it from overcurrent and setting brightness.",
+        plot: {type: "led", params: {V_supply:5, R_series:220, V_led:2.0}}
+      },
+
+      {
+        q: "Given supply V=5 V, LED forward voltage 2.0 V and desired current 20 mA, what series resistor value is appropriate (approx)?",
+        options: ["150 Ω", "3 kΩ", "100 Ω", "10 Ω"],
+        answer: 0,
+        explanation: "R = (V - V_LED)/I = (5 - 2)/0.02 = 150 Ω.",
+      },
+
+      {
+        q: "Which is an advantage of LEDs compared to incandescent lamps?",
+        options: [
+          "Higher power consumption",
+          "Lower lifetime",
+          "Higher luminous efficacy (more light per watt)",
+          "They emit a broad continuous spectrum"
+        ],
+        answer: 2,
+        explanation: "LEDs provide more light per watt (higher efficiency) and have much longer lifetimes compared to incandescent bulbs.",
+      },
+
+      {
+        q: "Which is a common disadvantage of LEDs noted in the document?",
+        options: [
+          "Contain mercury",
+          "Strong dependence on operating temperature and sensitivity to over‑voltage/current",
+          "They cannot be used in displays",
+          "They require vacuum to operate"
+        ],
+        answer: 1,
+        explanation: "LEDs can be temperature-sensitive and are vulnerable to over-voltage or over-current, and initial cost may be higher.",
+      },
+
+      {
+        q: "A laser diode differs from a simple LED because it:",
+        options: [
+          "Does not use p–n junction",
+          "Operates with stimulated emission inside an optical cavity producing coherent light",
+          "Can only be reverse biased",
+          "Has no dependence on semiconductor material"
+        ],
+        answer: 1,
+        explanation: "Laser diodes use stimulated emission in a resonant cavity to produce coherent, monochromatic light—unlike LEDs.",
+      },
+
+      {
+        q: "Photodiode operation: when light falls on a photodiode it:",
+        options: ["Produces voltage only when forward biased", "Generates current by converting photons to charge carriers", "Becomes an LED", "Increases its thermal resistance"],
+        answer: 1,
+        explanation: "Photodiodes convert incident photons into electrical current (photocurrent), typically operated in reverse bias for faster response.",
+      },
+
+      {
+        q: "What is the primary function of an optocoupler (optoisolator)?",
+        options: [
+          "Provide optical amplification",
+          "Provide absolute electrical isolation between input and output while transmitting signal optically",
+          "Increase voltage levels",
+          "Measure light intensity precisely"
+        ],
+        answer: 1,
+        explanation: "An optocoupler uses an LED and a photodetector to transmit signals while providing electrical isolation between circuits.",
+      },
+
+      {
+        q: "Which device in the slides can be used as a light sensor producing current proportional to light intensity?",
+        options: ["LED", "Schottky diode", "Photodiode", "Zener diode"],
+        answer: 2,
+        explanation: "A photodiode converts incident light into current and is used as a light detector.",
+      },
+
+      {
+        q: "Phototransistors differ from photodiodes mainly because:",
+        options: [
+          "They do not respond to light",
+          "They provide internal gain, producing larger currents from the same illumination",
+          "They require higher reverse voltage to operate",
+          "They are slower than LEDs"
+        ],
+        answer: 1,
+        explanation: "Phototransistors provide amplification of the photocurrent (internal gain) and thus give larger output currents for a given illumination compared with photodiodes.",
+      },
+
+      {
+        q: "Which of the following is a typical forward operating current for commercial LEDs mentioned in the slides?",
+        options: ["10–20 mA", "1–2 A", "1–5 μA", "1 kA"],
+        answer: 0,
+        explanation: "Typical LED forward operating currents for visible LEDs are around 10–20 mA.",
+      },
+
+      {
+        q: "What is the expected behavior of a Zener diode when V_thevenin < V_zener?",
+        options: [
+          "Diode operates in breakdown and clamps the voltage",
+          "Diode does not conduct and V_AB equals V_thevenin",
+          "Diode emits light",
+          "Diode short-circuits the supply"
+        ],
+        answer: 1,
+        explanation: "If the Thevenin voltage is below the Zener voltage, the Zener is not in breakdown and does not conduct significantly; V_AB equals V_thevenin.",
+      },
+
+      {
+        q: "Which quantity indicates the minimum current required for a Zener diode to properly regulate at V_Z?",
+        options: ["I_Zmin", "I_Zmax", "P_D", "V_R"],
+        answer: 0,
+        explanation: "I_Zmin (minimum Zener current) is the minimum current needed for the diode to reach its specified Zener voltage.",
+      },
+
+      {
+        q: "Which figure would you expect to see on a Zener characteristic curve?",
+        options: [
+          "A nearly vertical increase in forward current near 0.7 V",
+          "A flat region in reverse voltage around V_Z and steep forward exponential region",
+          "A symmetric I–V curve like a resistor",
+          "A triangular waveform"
+        ],
+        answer: 1,
+        explanation: "The Zener I–V shows a forward exponential region (like a diode) and in reverse a sharp breakdown region where voltage remains near V_Z across a range of currents.",
+        plot: {type: "zener", params: {Vz:5.1, Iz_min:1e-3, Iz_max:30e-3}}
+      },
+
+      {
+        q: "When designing a Zener-based regulator for a variable load, what is a recommended design consideration?",
+        options: [
+          "Choose R_S so that for minimum input and maximum load the Zener current remains above I_Zmin, and for maximum input and minimum load Zener current stays below I_Zmax",
+          "Always omit the series resistor to reduce losses",
+          "Operate the Zener at its maximum power rating constantly",
+          "Use the Zener only without a load"
+        ],
+        answer: 0,
+        explanation: "Proper design ensures Zener current stays between I_Zmin and I_Zmax across expected input and load extremes.",
+      }
+
+    ];
+
+    let cur = 0;
+    const userAnswers = new Array(questions.length);
+
+    function updateProgress() {
+      const ratio = ((cur) / questions.length) * 100;
+      document.getElementById('progress-bar').style.width = ratio + '%';
+    }
+
+    function render() {
+      const q = questions[cur];
+      document.getElementById('qnum').innerText = `Question ${cur+1} / ${questions.length}`;
+      document.getElementById('question-text').innerHTML = q.q;
+      const opts = document.getElementById('options');
+      opts.innerHTML = '';
+      q.options.forEach((o, i) => {
+        const div = document.createElement('div');
+        div.className = 'opt';
+        div.innerText = o;
+        div.onclick = () => selectOption(i);
+        if (userAnswers[cur] !== undefined) {
+          div.classList.toggle('selected', userAnswers[cur]===i);
+          if (userAnswers[cur]===q.answer) div.classList.add('correct');
+          else if (i===userAnswers[cur]) div.classList.add('wrong');
+          if (i===q.answer) div.classList.add('correct');
+        }
+        opts.appendChild(div);
+      });
+
+      // explanation
+      const exp = document.getElementById('explanation');
+      exp.style.display = userAnswers[cur] === undefined ? 'none' : 'block';
+      exp.innerHTML = userAnswers[cur] === undefined ? '' : `<strong>Explanation:</strong> ${q.explanation}`;
+
+      // plot area
+      const plotArea = document.getElementById('plot-area');
+      plotArea.style.display = q.plot ? 'block' : 'none';
+      if (q.plot) {
+        const c = document.getElementById('iv-plot');
+        c.width = Math.min(760, document.body.clientWidth - 60);
+        c.height = 300;
+        if (q.plot.type === 'zener') drawZenerIV(c, q.plot.params);
+        if (q.plot.type === 'led') drawLEDIV(c, q.plot.params);
+      }
+
+      updateProgress();
+      MathJax.typesetPromise();
+    }
+
+    function selectOption(i) {
+      userAnswers[cur] = i;
+      render();
+    }
+
+    document.getElementById('nextBtn').onclick = () => {
+      if (cur < questions.length - 1) { cur++; render(); }
+    };
+    document.getElementById('prevBtn').onclick = () => {
+      if (cur > 0) { cur--; render(); }
+    };
+    document.getElementById('revealBtn').onclick = () => {
+      userAnswers[cur] = questions[cur].answer;
+      render();
+    };
+    document.getElementById('finishBtn').onclick = finish;
+
+    function finish() {
+      let correct = 0;
+      questions.forEach((q,i) => { if (userAnswers[i] === q.answer) correct++; });
+      document.getElementById('quiz-area').style.display = 'none';
+      document.getElementById('final').style.display = 'block';
+      document.getElementById('score').innerHTML = `<strong>Score:</strong> ${correct} / ${questions.length} (${Math.round(correct/questions.length*100)}%)`;
+      const summary = document.getElementById('summary');
+      let html = '<ol>';
+      questions.forEach((q,i)=> {
+        const ok = userAnswers[i]===q.answer ? '✔' : '✖';
+        html += `<li><strong>${ok}</strong> ${q.q}<br><em>Your answer:</em> ${userAnswers[i]===undefined ? '—' : q.options[userAnswers[i]]} <br><em>Correct:</em> ${q.options[q.answer]}<br><em>Explanation:</em> ${q.explanation}</li><hr>`;
+      });
+      html += '</ol>';
+      summary.innerHTML = html;
+      window.scrollTo(0,0);
+    }
+
+    // Simple plotting helpers (illustrative, not precise datasheet plots)
+    function drawAxes(ctx, padLeft, padTop, w, h, xLabel, yLabel) {
+      ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+      ctx.strokeStyle = '#666'; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padLeft, padTop);
+      ctx.lineTo(padLeft, padTop + h);
+      ctx.lineTo(padLeft + w, padTop + h);
+      ctx.stroke();
+      ctx.fillStyle = '#333'; ctx.font = '12px Arial';
+      ctx.fillText(xLabel, padLeft + w - 40, padTop + h + 20);
+      ctx.fillText(yLabel, padLeft - 36, padTop + 10);
+    }
+
+    function drawZenerIV(canvas, params) {
+      const ctx = canvas.getContext('2d');
+      const padL = 50, padT = 20, w = canvas.width - 80, h = canvas.height - 80;
+      drawAxes(ctx, padL, padT, w, h, 'Voltage (V)', 'Current (A)');
+      // Plot forward exponential (approx)
+      ctx.strokeStyle = '#1e40af'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let ix=0; ix<=100; ix++) {
+        const V = -2 + ix * (7/100); // -2V .. +5V
+        // crude model: forward (V>0): I ~ exp(2.3*V) * 1e-3, reverse: small until breakdown then large
+        let I;
+        if (V >= 0) I = Math.exp(2.3 * V) * 1e-4;
+        else {
+          if (V <= -params.Vz) I = 1e-3 + (Math.abs(V)-params.Vz)*5e-2; else I = 1e-6;
+        }
+        // map to canvas (log scale for I)
+        const y = padT + h - Math.min(h, Math.log10(I+1e-9+1e-9) * (h/6) + h*0.2);
+        const x = padL + ( (V + 2) / 7 ) * w;
+        if (ix===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+      // Annotate Vz
+      ctx.fillStyle='#dc2626'; ctx.font='12px Arial';
+      const xVz = padL + ((params.Vz + 2) / 7) * w;
+      ctx.fillText(`V_Z ≈ ${params.Vz} V`, xVz - 30, padT + 14);
+      // grid visual
+      ctx.strokeStyle='#eee'; ctx.lineWidth=1;
+      for (let gx=1; gx<7; gx++){
+        ctx.beginPath();
+        ctx.moveTo(padL + (gx/7)*w, padT);
+        ctx.lineTo(padL + (gx/7)*w, padT + h);
+        ctx.stroke();
+      }
+    }
+
+    function drawLEDIV(canvas, params) {
+      const ctx = canvas.getContext('2d');
+      const padL = 50, padT = 20, w = canvas.width - 80, h = canvas.height - 80;
+      drawAxes(ctx, padL, padT, w, h, 'Voltage (V)', 'Current (A)');
+      ctx.strokeStyle = '#059669'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      // simple exponential forward model
+      for (let ix=0; ix<=100; ix++){
+        const V = 0 + ix * (3.0/100); // 0..3V
+        const I = V <= params.V_led ? Math.max(1e-6, 1e-6 * Math.exp(5*(V/params.V_led))) : 1e-3 * Math.exp(4*(V-params.V_led));
+        const x = padL + (V / 3.0) * w;
+        const y = padT + h - Math.min(h, Math.log10(I+1e-9) * (h/6) + h*0.2);
+        if (ix===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+      ctx.fillStyle='#111'; ctx.font='12px Arial';
+      const xLed = padL + (params.V_led/3.0)*w;
+      ctx.fillText(`V_LED ≈ ${params.V_led} V`, xLed - 30, padT + 14);
+      // show series resistor operating point if params provided
+      if (params.V_supply && params.R_series) {
+        // compute current: I = (V_supply - V_led)/R_series (approx)
+        const Iop = Math.max(1e-9,(params.V_supply - params.V_led) / params.R_series);
+        // draw horizontal marker at Iop (log mapping)
+        const yOp = padT + h - Math.min(h, Math.log10(Iop+1e-9) * (h/6) + h*0.2);
+        ctx.strokeStyle = '#b45309';
+        ctx.beginPath(); ctx.moveTo(padL, yOp); ctx.lineTo(padL + w, yOp); ctx.stroke();
+        ctx.fillStyle='#b45309'; ctx.fillText(`I_op ≈ ${(Iop*1000).toFixed(2)} mA`, padL+6, yOp - 6);
+      }
+    }
+
+    // init
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trigonometric Functions Quiz</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .quiz-container {
+            padding: 40px;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .question-container.current {
+            border-color: #667eea;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafafa;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .option.correct {
+            background: #4caf50 !important;
+            color: white !important;
+            border-color: #4caf50 !important;
+        }
+
+        .option.incorrect {
+            background: #f44336 !important;
+            color: white !important;
+            border-color: #f44336 !important;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .feedback.correct {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border-left: 5px solid #4caf50;
+        }
+
+        .feedback.incorrect {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 5px solid #f44336;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+            padding: 20px 0;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .results {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .results h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .final-score {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .score-excellent { color: #4caf50; }
+        .score-good { color: #ff9800; }
+        .score-poor { color: #f44336; }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .quiz-container {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Trigonometric Functions Quiz</h1>
+            <p>Test your knowledge of trigonometry</p>
+        </div>
+
+        <div id="quiz-container" class="quiz-container">
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div id="score-display" class="score-display">Score: 0/20</div>
+            
+            <div id="questions-container"></div>
+            
+            <div class="controls">
+                <button id="prev-btn" class="btn btn-secondary" onclick="previousQuestion()" disabled>Previous</button>
+                <button id="next-btn" class="btn btn-primary" onclick="nextQuestion()">Next</button>
+                <button id="submit-btn" class="btn btn-primary hidden" onclick="submitQuiz()">Submit Quiz</button>
+            </div>
+        </div>
+
+        <div id="results-container" class="results hidden">
+            <h2>🎉 Quiz Complete!</h2>
+            <div id="final-score" class="final-score">0/20</div>
+            <p id="score-message"></p>
+            <button class="btn btn-primary" onclick="restartQuiz()">Take Quiz Again</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "How do you convert an angle from degrees ($d$) to radians ($r$)?",
+                options: [
+                    "$r = d \\cdot \\frac{180}{\\pi}$",
+                    "$r = d \\cdot \\frac{\\pi}{180}$",
+                    "$r = d + 180\\pi$",
+                    "$r = \\frac{d}{180\\pi}$"
+                ],
+                correct: 1,
+                explanation: "The conversion formula is based on the fact that $180^\\circ = \\pi$ radians. To convert degrees to radians, you multiply by $\\frac{\\pi}{180}$."
+            },
+            {
+                question: "What are the values of $\\cos(0)$ and $\\sin(0)$?",
+                options: [
+                    "$\\cos(0)=0, \\sin(0)=1$",
+                    "$\\cos(0)=1, \\sin(0)=0$",
+                    "$\\cos(0)=0, \\sin(0)=0$",
+                    "$\\cos(0)=1, \\sin(0)=1$"
+                ],
+                correct: 1,
+                explanation: "On the unit circle, the angle 0 corresponds to the point $(1, 0)$. Since $\\cos(\\theta) = x$ and $\\sin(\\theta) = y$, we have $\\cos(0)=1$ and $\\sin(0)=0$."
+            },
+            {
+                question: "What is the value of $\\sin(\\frac{\\pi}{2})$?",
+                options: [
+                    "0",
+                    "1",
+                    "-1",
+                    "$\\frac{\\sqrt{2}}{2}$"
+                ],
+                correct: 1,
+                explanation: "The angle $\\frac{\\pi}{2}$ radians (or $90^\\circ$) on the unit circle corresponds to the point $(0, 1)$. Therefore, $\\sin(\\frac{\\pi}{2}) = 1$."
+            },
+            {
+                question: "Which fundamental trigonometric identity comes from the Pythagorean theorem applied to the unit circle?",
+                options: [
+                    "$\\tan(x) = \\frac{\\sin(x)}{\\cos(x)}$",
+                    "$\\sin^2(x) + \\cos^2(x) = 1$",
+                    "$\\sec(x) = \\frac{1}{\\cos(x)}$",
+                    "$\\sin(x) = \\cos(\\frac{\\pi}{2} - x)$"
+                ],
+                correct: 1,
+                explanation: "For any point $(x,y)$ on the unit circle, $x^2+y^2=1$. Since $x=\\cos(\\theta)$ and $y=\\sin(\\theta)$, this gives the identity $\\cos^2(\\theta) + \\sin^2(\\theta) = 1$."
+            },
+            {
+                question: "What is the period of the function $f(x) = \\sin(x)$?",
+                options: [
+                    "$\\pi$",
+                    "$2\\pi$",
+                    "$\\frac{\\pi}{2}$",
+                    "$4\\pi$"
+                ],
+                correct: 1,
+                explanation: "The sine function is periodic with a period of $2\\pi$, which means its values repeat every $2\\pi$ radians. $\\sin(x+2\\pi) = \\sin(x)$."
+            },
+            {
+                question: "What is the range of the function $f(x) = \\cos(x)$?",
+                options: [
+                    "$(-\\infty, \\infty)$",
+                    "$[0, 1]$",
+                    "$[-1, 1]$",
+                    "$(0, 2\\pi)$"
+                ],
+                correct: 2,
+                explanation: "The cosine function, representing the x-coordinate on the unit circle, oscillates between -1 and 1. Its range is the closed interval $[-1, 1]$."
+            },
+            {
+                question: "How is the tangent function, $\\tan(x)$, defined?",
+                options: [
+                    "$\\frac{\\cos(x)}{\\sin(x)}$",
+                    "$\\frac{1}{\\sin(x)}$",
+                    "$\\sin(x) \\cdot \\cos(x)$",
+                    "$\\frac{\\sin(x)}{\\cos(x)}$"
+                ],
+                correct: 3,
+                explanation: "The tangent function is defined as the ratio of the sine to the cosine: $\\tan(x) = \\frac{\\sin(x)}{\\cos(x)}$."
+            },
+            {
+                question: "For which values of $x$ is $\\tan(x)$ undefined?",
+                options: [
+                    "$x = k\\pi$, where $k$ is an integer",
+                    "$x = \\frac{\\pi}{2} + k\\pi$, where $k$ is an integer",
+                    "$x = 2k\\pi$, where $k$ is an integer",
+                    "$\\tan(x)$ is always defined."
+                ],
+                correct: 1,
+                explanation: "The tangent function is undefined when its denominator, $\\cos(x)$, is zero. This occurs at $x = \\pm\\frac{\\pi}{2}, \\pm\\frac{3\\pi}{2}, \\dots$, which can be written as $x = \\frac{\\pi}{2} + k\\pi$ for any integer $k$."
+            },
+            {
+                question: "Which of the following describes the symmetry of the cosine function?",
+                options: [
+                    "It is an odd function (symmetric about the origin).",
+                    "It is an even function (symmetric about the y-axis).",
+                    "It is symmetric about the x-axis.",
+                    "It has no symmetry."
+                ],
+                correct: 1,
+                explanation: "The cosine function is an even function because $\\cos(-x) = \\cos(x)$. Its graph is symmetric with respect to the y-axis."
+            },
+            {
+                question: "Which of the following describes the symmetry of the sine function?",
+                options: [
+                    "It is an odd function (symmetric about the origin).",
+                    "It is an even function (symmetric about the y-axis).",
+                    "It is symmetric about the x-axis.",
+                    "It has no symmetry."
+                ],
+                correct: 0,
+                explanation: "The sine function is an odd function because $\\sin(-x) = -\\sin(x)$. Its graph is symmetric with respect to the origin."
+            },
+            {
+                question: "What is the value of $\\tan(\\frac{\\pi}{4})$?",
+                options: [
+                    "0",
+                    "1",
+                    "$\\sqrt{3}$",
+                    "Undefined"
+                ],
+                correct: 1,
+                explanation: "At $\\frac{\\pi}{4}$ radians ($45^\\circ$), $\\sin(\\frac{\\pi}{4}) = \\frac{\\sqrt{2}}{2}$ and $\\cos(\\frac{\\pi}{4}) = \\frac{\\sqrt{2}}{2}$. Therefore, $\\tan(\\frac{\\pi}{4}) = \\frac{\\sin(\\pi/4)}{\\cos(\\pi/4)} = 1$."
+            },
+            {
+                question: "The function $f(x) = \\sec(x)$ is the reciprocal of which function?",
+                options: [
+                    "$\\sin(x)$",
+                    "$\\cos(x)$",
+                    "$\\tan(x)$",
+                    "$\\cot(x)$"
+                ],
+                correct: 1,
+                explanation: "The secant function is defined as the reciprocal of the cosine function: $\\sec(x) = \\frac{1}{\\cos(x)}$."
+            },
+            {
+                question: "What is the period of the function $f(x) = \\tan(x)$?",
+                options: [
+                    "$\\pi$",
+                    "$2\\pi$",
+                    "$\\frac{\\pi}{2}$",
+                    "It is not periodic."
+                ],
+                correct: 0,
+                explanation: "The tangent function has a period of $\\pi$, which is shorter than the period of sine and cosine. $\\tan(x+\\pi) = \\tan(x)$."
+            },
+            {
+                question: "Convert $60^\\circ$ to radians.",
+                options: [
+                    "$\\frac{\\pi}{6}$",
+                    "$\\frac{\\pi}{4}$",
+                    "$\\frac{\\pi}{3}$",
+                    "$\\frac{\\pi}{2}$"
+                ],
+                correct: 2,
+                explanation: "Using the formula $r = d \\cdot \\frac{\\pi}{180}$, we get $r = 60 \\cdot \\frac{\\pi}{180} = \\frac{\\pi}{3}$ radians."
+            },
+            {
+                question: "The general solution for the equation $\\sin(x) = 0$ is:",
+                options: [
+                    "$x = k\\pi$, where $k$ is an integer",
+                    "$x = \\frac{\\pi}{2} + 2k\\pi$, where $k$ is an integer",
+                    "$x = 2k\\pi$, where $k$ is an integer",
+                    "$x = \\frac{\\pi}{2} + k\\pi$, where $k$ is an integer"
+                ],
+                correct: 0,
+                explanation: "The sine function is zero at all integer multiples of $\\pi$. So, the general solution is $x = k\\pi$ for $k \\in \\mathbb{Z}$."
+            },
+            {
+                question: "The general solution for the equation $\\cos(x) = 1$ is:",
+                options: [
+                    "$x = k\\pi$, where $k$ is an integer",
+                    "$x = \\frac{\\pi}{2} + 2k\\pi$, where $k$ is an integer",
+                    "$x = 2k\\pi$, where $k$ is an integer",
+                    "$x = (2k+1)\\pi$, where $k$ is an integer"
+                ],
+                correct: 2,
+                explanation: "The cosine function equals 1 at all even multiples of $\\pi$ (i.e., $0, 2\\pi, 4\\pi, \\dots$). The general solution is $x = 2k\\pi$ for $k \\in \\mathbb{Z}$."
+            },
+            {
+                question: "What is the value of $\\cos(\\pi)$?",
+                options: [
+                    "0",
+                    "1",
+                    "-1",
+                    "$\\frac{1}{2}$"
+                ],
+                correct: 2,
+                explanation: "The angle $\\pi$ radians ($180^\\circ$) on the unit circle corresponds to the point $(-1, 0)$. Therefore, $\\cos(\\pi) = -1$."
+            },
+            {
+                question: "The function $f(x) = \\csc(x)$ has vertical asymptotes where which function is zero?",
+                options: [
+                    "$\\sin(x)$",
+                    "$\\cos(x)$",
+                    "$\\tan(x)$",
+                    "$\\sec(x)$"
+                ],
+                correct: 0,
+                explanation: "Since $\\csc(x) = \\frac{1}{\\sin(x)}$, it has vertical asymptotes whenever its denominator, $\\sin(x)$, is equal to zero."
+            },
+            {
+                question: "Solve the equation $2\\sin(x) - 1 = 0$ for $x$ in the interval $[0, 2\\pi)$.",
+                options: [
+                    "$x = \\frac{\\pi}{6}, \\frac{5\\pi}{6}$",
+                    "$x = \\frac{\\pi}{3}, \\frac{2\\pi}{3}$",
+                    "$x = \\frac{\\pi}{6}, \\frac{11\\pi}{6}$",
+                    "$x = \\frac{\\pi}{4}, \\frac{3\\pi}{4}$"
+                ],
+                correct: 0,
+                explanation: "First, solve for $\\sin(x)$: $\\sin(x) = \\frac{1}{2}$. In the interval $[0, 2\\pi)$, this occurs at two angles: $x = \\frac{\\pi}{6}$ (in the first quadrant) and $x = \\pi - \\frac{\\pi}{6} = \\frac{5\\pi}{6}$ (in the second quadrant)."
+            },
+            {
+                question: "The graph of $y = \\cos(x)$ can be obtained by shifting the graph of $y = \\sin(x)$ by...",
+                options: [
+                    "$\\frac{\\pi}{2}$ units to the right",
+                    "$\\frac{\\pi}{2}$ units to the left",
+                    "$\\pi$ units to the right",
+                    "$\\pi$ units to the left"
+                ],
+                correct: 1,
+                explanation: "The relationship between sine and cosine is given by the identity $\\cos(x) = \\sin(x + \\frac{\\pi}{2})$. This represents a horizontal shift of the sine graph by $\\frac{\\pi}{2}$ units to the left."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = [];
+        let showingResults = false;
+
+        function renderQuestion(index) {
+            const question = questions[index];
+            const container = document.getElementById('questions-container');
+            
+            container.innerHTML = `
+                <div class="question-container current">
+                    <div class="question-header">
+                        <span class="question-number">Question ${index + 1}</span>
+                        <span>${index + 1} / ${questions.length}</span>
+                    </div>
+                    <div class="question-text">${question.question}</div>
+                    <div class="options">
+                        ${question.options.map((option, i) => 
+                            `<div class="option" onclick="selectAnswer(${i})" data-option="${i}">
+                                ${option}
+                            </div>`
+                        ).join('')}
+                    </div>
+                    <div id="feedback" class="feedback hidden"></div>
+                </div>
+            `;
+            
+            if (userAnswers[index] !== undefined) {
+                showAnswer(index);
+            }
+            
+            MathJax.typesetPromise();
+        }
+
+        function selectAnswer(optionIndex) {
+            if (showingResults) return;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            document.querySelector(`[data-option="${optionIndex}"]`).classList.add('selected');
+            
+            userAnswers[currentQuestion] = optionIndex;
+            
+            showAnswer(currentQuestion);
+            
+            updateScore();
+            updateProgress();
+        }
+
+        function showAnswer(questionIndex) {
+            const question = questions[questionIndex];
+            const userAnswer = userAnswers[questionIndex];
+            const isCorrect = userAnswer === question.correct;
+            
+            document.querySelectorAll('.option').forEach((opt, i) => {
+                if (i === question.correct) {
+                    opt.classList.add('correct');
+                } else if (i === userAnswer && !isCorrect) {
+                    opt.classList.add('incorrect');
+                }
+                opt.style.pointerEvents = 'none';
+            });
+            
+            const feedback = document.getElementById('feedback');
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.innerHTML = `
+                <strong>${isCorrect ? '✅ Correct!' : '❌ Incorrect!'}</strong><br>
+                ${question.explanation}
+            `;
+            feedback.classList.remove('hidden');
+            
+            MathJax.typesetPromise();
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion(currentQuestion);
+                updateButtons();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion(currentQuestion);
+                updateButtons();
+            }
+        }
+
+        function updateButtons() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            prevBtn.disabled = currentQuestion === 0;
+            
+            if (currentQuestion === questions.length - 1) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            }
+        }
+
+        function updateScore() {
+            score = userAnswers.filter((answer, index) => 
+                answer === questions[index].correct
+            ).length;
+            
+            document.getElementById('score-display').textContent = `Score: ${score}/${questions.length}`;
+        }
+
+        function updateProgress() {
+            const answeredCount = userAnswers.filter(a => a !== undefined).length;
+            const progress = (answeredCount / questions.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+
+        function submitQuiz() {
+            showingResults = true;
+            updateScore();
+            
+            const quizContainer = document.getElementById('quiz-container');
+            const resultsContainer = document.getElementById('results-container');
+            
+            quizContainer.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+            
+            const finalScore = document.getElementById('final-score');
+            const scoreMessage = document.getElementById('score-message');
+            const percentage = Math.round((score / questions.length) * 100);
+            
+            finalScore.textContent = `${score}/${questions.length} (${percentage}%)`;
+            
+            if (percentage >= 90) {
+                finalScore.className = 'final-score score-excellent';
+                scoreMessage.textContent = '🎉 Excellent! You have mastered trigonometry!';
+            } else if (percentage >= 70) {
+                finalScore.className = 'final-score score-good';
+                scoreMessage.textContent = '👍 Good job! You have a solid understanding.';
+            } else {
+                finalScore.className = 'final-score score-poor';
+                scoreMessage.textContent = '📚 Keep studying! Review the concepts and try again.';
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = [];
+            showingResults = false;
+            
+            document.getElementById('quiz-container').classList.remove('hidden');
+            document.getElementById('results-container').classList.add('hidden');
+            
+            renderQuestion(0);
+            updateButtons();
+            updateScore();
+            document.getElementById('progress-fill').style.width = '0%';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderQuestion(0);
+            updateButtons();
+        });
+    </script>
+</body>
+</html>

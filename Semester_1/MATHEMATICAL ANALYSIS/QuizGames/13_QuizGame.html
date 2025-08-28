@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game - Complex Numbers</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #quiz-container {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        #question-container {
+            margin-bottom: 20px;
+        }
+        #question-text {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            font-size: 1em;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .option-btn:hover {
+            background-color: #f0f0f0;
+            border-color: #ccc;
+        }
+        .option-btn.correct {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .option-btn.incorrect {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        #feedback-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            display: none;
+            border: 1px solid transparent;
+        }
+        #feedback-container.correct {
+            background-color: #e2f0e5;
+            border-color: #c3e6cb;
+            color: #155724;
+            display: block;
+        }
+        #feedback-container.incorrect {
+            background-color: #fbe4e6;
+            border-color: #f5c6cb;
+            color: #721c24;
+            display: block;
+        }
+        #controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+        }
+        #next-btn, #restart-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            background-color: #007bff;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #next-btn:hover, #restart-btn:hover {
+            background-color: #0056b3;
+        }
+        #restart-btn {
+            background-color: #6c757d;
+            display: none;
+        }
+        #progress-text {
+            font-size: 1em;
+            font-weight: 500;
+        }
+        #score-container {
+            text-align: center;
+            display: none;
+        }
+        #score-text {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div id="question-container">
+        <div id="question-text"></div>
+        <div id="options-container"></div>
+    </div>
+    <div id="feedback-container"></div>
+    <div id="controls">
+        <span id="progress-text"></span>
+        <button id="next-btn">Next</button>
+    </div>
+    <div id="score-container">
+        <div id="score-text"></div>
+        <button id="restart-btn">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            question: "What is the value of the imaginary unit $i$ squared, i.e., $i^2$?",
+            options: [
+                "1",
+                "-1",
+                "$i$",
+                "$-i$"
+            ],
+            correct: 1,
+            explanation: "The imaginary unit $i$ is defined as the square root of -1, so by definition, $i^2 = -1$."
+        },
+        {
+            question: "What is the value of $i^3$?",
+            options: [
+                "1",
+                "-1",
+                "$i$",
+                "$-i$"
+            ],
+            correct: 3,
+            explanation: "$i^3 = i^2 \\cdot i = (-1) \\cdot i = -i$. The powers of $i$ cycle through $i, -1, -i, 1$."
+        },
+        {
+            question: "For the complex number $z = 5 - 3i$, what are the real part $Re(z)$ and imaginary part $Im(z)$?",
+            options: [
+                "$Re(z)=5, Im(z)=-3$",
+                "$Re(z)=5, Im(z)=3$",
+                "$Re(z)=-3, Im(z)=5$",
+                "$Re(z)=5, Im(z)=-3i$"
+            ],
+            correct: 0,
+            explanation: "In a complex number $z = a + bi$, the real part is $a$ and the imaginary part is $b$. The imaginary part does not include the $i$."
+        },
+        {
+            question: "What is the sum of $(2+4i)$ and $(3-i)$?",
+            options: [
+                "$5+5i$",
+                "$5+3i$",
+                "$-1+5i$",
+                "$-1+3i$"
+            ],
+            correct: 1,
+            explanation: "To add complex numbers, add the real parts and the imaginary parts separately: $(2+3) + (4-1)i = 5+3i$."
+        },
+        {
+            question: "What is the product of $(1+2i)$ and $(3-i)$?",
+            options: [
+                "$3-2i$",
+                "$1+5i$",
+                "$5+5i$",
+                "$3+5i$"
+            ],
+            correct: 2,
+            explanation: "Use the distributive property (FOIL): $(1)(3) + (1)(-i) + (2i)(3) + (2i)(-i) = 3 - i + 6i - 2i^2 = 3 + 5i - 2(-1) = 3 + 5i + 2 = 5+5i$."
+        },
+        {
+            question: "What is the complex conjugate of $z = 7 - 2i$?",
+            options: [
+                "$-7 - 2i$",
+                "$-7 + 2i$",
+                "$7 + 2i$",
+                "$2 - 7i$"
+            ],
+            correct: 2,
+            explanation: "The complex conjugate, denoted $\\bar{z}$, is found by changing the sign of the imaginary part. So, the conjugate of $7 - 2i$ is $7 + 2i$."
+        },
+        {
+            question: "What is the result of multiplying a complex number $z = a+bi$ by its conjugate $\\bar{z}$?",
+            options: [
+                "$a^2 - b^2$",
+                "$a^2 + b^2$",
+                "$a^2 + b^2 + 2abi$",
+                "0"
+            ],
+            correct: 1,
+            explanation: "$z\\bar{z} = (a+bi)(a-bi) = a^2 - (bi)^2 = a^2 - b^2i^2 = a^2 - b^2(-1) = a^2 + b^2$. The result is always a non-negative real number."
+        },
+        {
+            question: "How do you perform the division $\\frac{3+2i}{1-i}$?",
+            options: [
+                "Divide the real parts and the imaginary parts separately.",
+                "Multiply the numerator and denominator by $i$.",
+                "Multiply the numerator and denominator by the conjugate of the denominator.",
+                "It's not possible to divide complex numbers."
+            ],
+            correct: 2,
+            explanation: "To divide, we make the denominator real by multiplying the top and bottom by its conjugate, which is $1+i$."
+        },
+        {
+            question: "Calculate the division $\\frac{3+2i}{1-i}$.",
+            options: [
+                "$\\frac{1}{2} + \\frac{5}{2}i$",
+                "$1+5i$",
+                "$5+i$",
+                "$\\frac{5}{2} + \\frac{1}{2}i$"
+            ],
+            correct: 0,
+            explanation: "$\\frac{3+2i}{1-i} = \\frac{(3+2i)(1+i)}{(1-i)(1+i)} = \\frac{3+3i+2i+2i^2}{1^2+1^2} = \\frac{3+5i-2}{2} = \\frac{1+5i}{2} = \\frac{1}{2} + \\frac{5}{2}i$."
+        },
+        {
+            question: "What is the modulus (or absolute value) of the complex number $z = 3 - 4i$?",
+            options: [
+                "5",
+                "7",
+                "25",
+                "$\\sqrt{7}$"
+            ],
+            correct: 0,
+            explanation: "The modulus $|z|$ is the distance from the origin in the complex plane. It's calculated as $|z| = \\sqrt{a^2+b^2} = \\sqrt{3^2 + (-4)^2} = \\sqrt{9+16} = \\sqrt{25} = 5$."
+        },
+        {
+            question: "What are the roots of the equation $x^2 + 9 = 0$?",
+            options: [
+                "$x=3$ and $x=-3$",
+                "$x=3i$ and $x=-3i$",
+                "$x=9i$ and $x=-9i$",
+                "There are no roots."
+            ],
+            correct: 1,
+            explanation: "$x^2 = -9$, so $x = \\pm\\sqrt{-9} = \\pm\\sqrt{9 \\cdot -1} = \\pm\\sqrt{9}\\sqrt{-1} = \\pm 3i$."
+        },
+        {
+            question: "If a polynomial has real coefficients and $2+5i$ is one of its roots, what must another root be?",
+            options: [
+                "$2-5i$",
+                "$-2+5i$",
+                "$-2-5i$",
+                "It cannot be determined."
+            ],
+            correct: 0,
+            explanation: "The Complex Conjugate Root Theorem states that if a polynomial has real coefficients, its complex roots must occur in conjugate pairs. Therefore, $2-5i$ must also be a root."
+        },
+        {
+            question: "In the polar form $z = r(\\cos\\phi + i\\sin\\phi)$, what does $r$ represent?",
+            options: [
+                "The real part of z",
+                "The imaginary part of z",
+                "The argument of z",
+                "The modulus of z"
+            ],
+            correct: 3,
+            explanation: "$r$ is the modulus of the complex number, representing its distance from the origin. $\\phi$ is the argument, representing the angle."
+        },
+        {
+            question: "Euler's formula states that $e^{i\\phi}$ is equal to:",
+            options: [
+                "$\\cos\\phi + i\\sin\\phi$",
+                "$\\sin\\phi + i\\cos\\phi$",
+                "$r(\\cos\\phi + i\\sin\\phi)$",
+                "$\\cos(i\\phi) + \\sin(i\\phi)$"
+            ],
+            correct: 0,
+            explanation: "Euler's formula provides a fundamental link between exponential functions and trigonometric functions in the complex plane: $e^{i\\phi} = \\cos\\phi + i\\sin\\phi$."
+        },
+        {
+            question: "Convert the complex number $z=1+i$ to polar form $r(\\cos\\phi + i\\sin\\phi)$.",
+            options: [
+                "$r=\\sqrt{2}, \\phi=\\pi/4$",
+                "$r=2, \\phi=\\pi/4$",
+                "$r=\\sqrt{2}, \\phi=\\pi/2$",
+                "$r=1, \\phi=\\pi/4$"
+            ],
+            correct: 0,
+            explanation: "The modulus is $r = \\sqrt{1^2+1^2} = \\sqrt{2}$. The angle is $\\phi = \\arctan(1/1) = \\pi/4$ (since the point is in the first quadrant). So, $z = \\sqrt{2}(\\cos(\\pi/4) + i\\sin(\\pi/4))$."
+        },
+        {
+            question: "Convert the complex number $z = 2e^{i\\pi/3}$ from exponential to Cartesian form $a+bi$.",
+            options: [
+                "$1 + i\\sqrt{3}$",
+                "$\\sqrt{3} + i$",
+                "$2 + i\\sqrt{3}$",
+                "$1 - i\\sqrt{3}$"
+            ],
+            correct: 0,
+            explanation: "$z = 2(\\cos(\\pi/3) + i\\sin(\\pi/3))$. Since $\\cos(\\pi/3) = 1/2$ and $\\sin(\\pi/3) = \\sqrt{3}/2$, we have $z = 2(1/2 + i\\sqrt{3}/2) = 1 + i\\sqrt{3}$."
+        },
+        {
+            question: "According to De Moivre's Theorem, what is $[r(\\cos\\phi + i\\sin\\phi)]^n$?",
+            options: [
+                "$r^n(\\cos\\phi + i\\sin\\phi)$",
+                "$r(\\cos(n\\phi) + i\\sin(n\\phi))$",
+                "$r^n(\\cos(n\\phi) + i\\sin(n\\phi))$",
+                "$r^n(\\cos^n\\phi + i\\sin^n\\phi)$"
+            ],
+            correct: 2,
+            explanation: "De Moivre's Theorem provides a simple way to calculate powers of complex numbers: raise the modulus to the power $n$ and multiply the argument by $n$."
+        },
+        {
+            question: "Use De Moivre's Theorem to calculate $(1+i)^4$.",
+            options: [
+                "4",
+                "-4",
+                "$4i$",
+                "$-4i$"
+            ],
+            correct: 1,
+            explanation: "First, convert $1+i$ to polar form: $z = \\sqrt{2}(\\cos(\\pi/4) + i\\sin(\\pi/4))$. Then, $z^4 = (\\sqrt{2})^4(\\cos(4\\cdot\\pi/4) + i\\sin(4\\cdot\\pi/4)) = 4(\\cos(\\pi) + i\\sin(\\pi)) = 4(-1 + 0i) = -4$."
+        },
+        {
+            question: "The set of real numbers $\\mathbb{R}$ is a subset of the set of complex numbers $\\mathbb{C}$.",
+            options: [
+                "True",
+                "False"
+            ],
+            correct: 0,
+            explanation: "True. Any real number $a$ can be written as a complex number with a zero imaginary part, $a + 0i$. Therefore, $\\mathbb{R} \\subset \\mathbb{C}$."
+        },
+        {
+            question: "What is the geometric effect of multiplying a complex number $z$ by $i$?",
+            options: [
+                "It reflects $z$ across the real axis.",
+                "It rotates $z$ by 90 degrees ($\\pi/2$ radians) counter-clockwise.",
+                "It doubles the modulus of $z$.",
+                "It rotates $z$ by 180 degrees ($\\pi$ radians)."
+            ],
+            correct: 1,
+            explanation: "In polar form, $i = e^{i\\pi/2}$. Multiplying $z = re^{i\\phi}$ by $i$ gives $z \\cdot i = re^{i\\phi}e^{i\\pi/2} = re^{i(\\phi+\\pi/2)}$. This increases the angle by $\\pi/2$, which is a 90-degree counter-clockwise rotation."
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    const questionTextElem = document.getElementById('question-text');
+    const optionsContainerElem = document.getElementById('options-container');
+    const feedbackContainerElem = document.getElementById('feedback-container');
+    const nextBtn = document.getElementById('next-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const progressTextElem = document.getElementById('progress-text');
+    const scoreContainerElem = document.getElementById('score-container');
+    const scoreTextElem = document.getElementById('score-text');
+    const questionContainerElem = document.getElementById('question-container');
+    const controlsElem = document.getElementById('controls');
+
+    function loadQuestion() {
+        answered = false;
+        feedbackContainerElem.style.display = 'none';
+        optionsContainerElem.innerHTML = '';
+        
+        const question = questions[currentQuestionIndex];
+        questionTextElem.innerHTML = question.question;
+        
+        question.options.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.innerHTML = option;
+            button.classList.add('option-btn');
+            button.addEventListener('click', () => selectAnswer(index, button));
+            optionsContainerElem.appendChild(button);
+        });
+
+        progressTextElem.innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        MathJax.typesetPromise();
+    }
+
+    function selectAnswer(selectedIndex, button) {
+        if (answered) return;
+        answered = true;
+
+        const question = questions[currentQuestionIndex];
+        const correctIndex = question.correct;
+
+        if (selectedIndex === correctIndex) {
+            score++;
+            button.classList.add('correct');
+            feedbackContainerElem.innerHTML = `<strong>Correct!</strong><br>${question.explanation}`;
+            feedbackContainerElem.className = 'feedback-container correct';
+        } else {
+            button.classList.add('incorrect');
+            optionsContainerElem.children[correctIndex].classList.add('correct');
+            feedbackContainerElem.innerHTML = `<strong>Incorrect.</strong><br>${question.explanation}`;
+            feedbackContainerElem.className = 'feedback-container incorrect';
+        }
+    }
+
+    function showScore() {
+        questionContainerElem.style.display = 'none';
+        controlsElem.style.display = 'none';
+        feedbackContainerElem.style.display = 'none';
+        scoreContainerElem.style.display = 'block';
+        restartBtn.style.display = 'block';
+        scoreTextElem.innerText = `Your Score: ${score} out of ${questions.length}`;
+    }
+
+    nextBtn.addEventListener('click', () => {
+        if (!answered && currentQuestionIndex < questions.length) {
+            alert("Please select an answer before proceeding.");
+            return;
+        }
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questions.length) {
+            loadQuestion();
+        } else {
+            showScore();
+        }
+    });
+
+    restartBtn.addEventListener('click', () => {
+        currentQuestionIndex = 0;
+        score = 0;
+        questionContainerElem.style.display = 'block';
+        controlsElem.style.display = 'flex';
+        scoreContainerElem.style.display = 'none';
+        restartBtn.style.display = 'none';
+        loadQuestion();
+    });
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

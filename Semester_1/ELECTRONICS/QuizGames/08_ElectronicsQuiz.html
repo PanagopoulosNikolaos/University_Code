@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>08_ElectronicsQuiz - Transistor Biasing & Load Line</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;max-width:980px;margin:18px auto;padding:12px;color:#222}
+    header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    h1{font-size:1.2rem;margin:0}
+    #progress{height:14px;background:#eee;border-radius:8px;overflow:hidden;margin:12px 0}
+    #progress > i{display:block;height:100%;background:#3b82f6;width:0%}
+    .question-card{border:1px solid #ddd;padding:16px;border-radius:8px;background:#fff}
+    .options{margin-top:12px;display:grid;grid-template-columns:1fr;gap:8px}
+    .opt{padding:10px;border-radius:6px;border:1px solid #ccc;cursor:pointer;background:#fafafa}
+    .opt.selected{border-color:#2563eb;background:#e6f0ff}
+    .opt.correct{border-color:#059669;background:#ecfdf5}
+    .opt.wrong{border-color:#dc2626;background:#fff1f2}
+    .controls{display:flex;gap:8px;justify-content:space-between;margin-top:14px}
+    .btn{padding:8px 12px;border-radius:6px;border:1px solid #888;background:#f3f4f6;cursor:pointer}
+    .btn.primary{background:#2563eb;color:#fff;border-color:#1e40af}
+    #explanation{margin-top:12px;padding:10px;border-left:4px solid #ddd;background:#fafafa;border-radius:4px}
+    #final{display:none;text-align:left;margin-top:20px}
+    canvas{border:1px solid #ddd;border-radius:4px;background:#fff;max-width:100%}
+    footer{margin-top:18px;font-size:0.9rem;color:#555}
+    .note{font-size:0.9rem;color:#444;margin-top:6px}
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Transistor Biasing & Load Line — Quiz</h1>
+    <div class="note">Based on ELECTRONICS/08_Polwsi_Transistor.pdf — English questions and explanations</div>
+  </header>
+
+  <div id="progress"><i id="progress-bar"></i></div>
+
+  <div id="quiz-area" class="question-card">
+    <div id="qnum"></div>
+    <div id="question-text" style="margin-top:8px"></div>
+
+    <div id="plot-area" style="margin-top:12px;display:none">
+      <canvas id="bias-plot" width="860" height="300"></canvas>
+    </div>
+
+    <div class="options" id="options"></div>
+
+    <div id="explanation" style="display:none"></div>
+
+    <div class="controls">
+      <div>
+        <button class="btn" id="prevBtn">Previous</button>
+        <button class="btn" id="nextBtn">Next</button>
+      </div>
+      <div>
+        <button class="btn" id="revealBtn">Reveal Answer</button>
+        <button class="btn primary" id="finishBtn">Finish</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="final" class="question-card">
+    <h2>Results</h2>
+    <div id="score"></div>
+    <div id="summary" style="margin-top:12px"></div>
+  </div>
+
+  <footer>
+    <div>UI and behavior modeled on MATHEMATICAL ANALYSIS/04_QizGame.html</div>
+  </footer>
+
+  <script>
+    const questions = [
+      { q: "What is the transistor 'load line' used for?", options:["To draw only AC responses","To find the operating point (Q) by intersection with device curves","To calculate VBE exactly","To measure capacitance"], answer:1,
+        explanation:"Load line graphically shows possible (VCE, IC) for the circuit; intersection with transistor family gives Q." },
+
+      { q: "The operating point Q is usually expressed as:", options:["Q(VCE, IC)","Q(R, C)","Q(β, α)","Q(VB, VE)"], answer:0,
+        explanation:"Q is the DC operating point given by V_CE and I_C." },
+
+      { q: "Which step is part of finding Q using the method in slides?", options:["Solve AC small-signal first","Compute IC from input loop and solve VCE from output loop","Discard DC sources","Always set β=1"], answer:1,
+        explanation:"Method: compute IC (from input/bias) then compute VCE via output loop (load line)." },
+
+      { q: "To find I_C(sat) for a given output circuit you set which variable to zero in the load-line equation?", options:["VCC","VCE","IB","VBE"], answer:1,
+        explanation:"To find saturation collector current set VCE=0 and solve for ICsat from circuit equation." },
+
+      { q: "Which bias arrangement uses a single resistor to feed base and sets IB approximately constant (slide term)?", options:["Base bias (fixed base current)","Emitter bias","Voltage divider bias","Collector feedback bias"], answer:0,
+        explanation:"Base bias uses a base resistor and VBB to set base current approximately constant." },
+
+      { q: "What is the voltage at the base for a divider bias network (R1, R2 from VCC)?", options:["VB = R2/(R1+R2) × VCC","VB = R1/(R1+R2) × VCC","VB = VCC × (R1+R2)","VB = VCC/2 always"], answer:0,
+        explanation:"Voltage divider formula: VB = R2/(R1+R2) × VCC (assuming R1 top, R2 bottom to ground)." },
+
+      { q: "Which biasing technique improves Q stability against β variations by adding resistor in emitter?", options:["Base bias","Emitter bias (emitter resistor)","No bias","Short emitter"], answer:1,
+        explanation:"Emitter resistor provides negative feedback stabilizing Q vs β changes." },
+
+      { q: "In emitter-bias with emitter resistor, what happens to emitter current when temperature (and thus IC) increases?", options:["Emitter current decreases strongly","Emitter voltage rises, reducing VBE and thus IB, counteracting IC increase","Nothing changes","Emitter becomes open"], answer:1,
+        explanation:"Negative feedback via RE increases VE, reducing VBE and IB, countering IC rise." },
+
+      { q: "Which bias method is best for a stable Q independent of β (slides mention)?", options:["Simple base bias","Dual-supply emitter bias or divider bias with emitter resistor","No bias","Use very small R"], answer:1,
+        explanation:"Dual-supply emitter bias or divider with feedback gives better stability against β variations." },
+
+      { q: "What approximation is used in many slide examples for VBE when doing DC checks?", options:["VBE ≈ 0.1 V","VBE ≈ 0.7 V","VBE ≈ 5 V","VBE ≈ 2 V"], answer:1,
+        explanation:"Common approximation for silicon BJTs: VBE ≈ 0.7 V." },
+
+      { q: "When drawing load line, the intercept on VCE axis corresponds to which condition?", options:["IC = maximum","IC = 0 (cutoff)","IC = saturation","Base open"], answer:1,
+        explanation:"VCE cut-off intercept is when IC = 0; solving circuit gives VCE(cutoff)." },
+
+      { q: "When designing bias, why is it recommended to place Q near the middle of the transistor 'plateau'?", options:["To minimize power","To allow maximum symmetrical AC swing without clipping","To maximize β","To guarantee cutoff"], answer:1,
+        explanation:"Midpoint Q gives largest undistorted AC swing before clipping in either direction." },
+
+      { q: "Which equation is used for the load-line of collector circuit with RC and VCC?", options:["VCC = IC RC + VCE","VCC = VCE / RC","VCE = VCC × RC","RC = VCC / IC only"], answer:0,
+        explanation:"KVL: VCC = IC·RC + VCE; rearrange to plot load line." },
+
+      { q: "In voltage-divider bias, VB is set by resistor ratio. To compute emitter current IE approximately you typically do:", options:["IE ≈ (VB - VBE)/RE","IE ≈ VB × RE","IE ≈ VCC / (R1+R2)","IE ≈ 0 always"], answer:0,
+        explanation:"Emitter current IE ≈ (VB - VBE)/RE (assuming base current small relative to divider current or accounting for IB)."},
+
+
+      { q: "What is the advantage of emitter feedback compared to simple base bias?", options:["Less parts","Improved thermal and β stability","Faster switching","Higher gain only"], answer:1,
+        explanation:"Emitter feedback stabilizes operating point against temperature and β variations." },
+
+      { q: "In 'bias with collector and emitter feedback' where does the input loop start (slide text)?", options:["From ground","From collector","From base","From VBE"], answer:1,
+        explanation:"That topology uses feedback from collector-emitter network, so input loop effectively starts from collector." },
+
+      { q: "If you assume IB negligible in a double-supply emitter bias, what simplification is made?", options:["IE ≈ 0","IC ≈ IE","VB = 0","β = 1"], answer:1,
+        explanation:"With IB negligible, emitter and collector currents are approximately equal (IC ≈ IE)." },
+
+      { q: "What design action ensures Zener or bias divider current strongly exceeds base current to stabilize VB?", options:["Make divider resistances very large","Make divider current (through R1-R2) much larger than IB (e.g., 10× IB)","Remove divider","Short R2"], answer:1,
+        explanation:"Divider bias stability is improved by making the divider supply current significantly larger than base current so VB ~ divider voltage." },
+
+      { q: "Which transistor region must Q lie in for a small-signal amplifier?", options:["Cutoff","Saturation","Active region","Breakdown"], answer:2,
+        explanation:"Amplifiers operate with transistor in active region where IC ≈ β·IB and VCE sufficient." },
+
+      { q: "What is the typical procedure to draw the load line after computing IC(sat) and VCE(cutoff)?", options:["Plot those two intercepts on axes and join with a straight line","Plot only one point","Draw a parabola","Use only datasheet"], answer:0,
+        explanation:"Load line is constructed by plotting (VCEcutoff, IC=0) and (VCE=0, IC=ICsat) and connecting them." },
+
+      { q: "Which parameter variation is bias-with-feedback intended to reduce sensitivity to?", options:["Supply frequency","β (current gain) variation","Case size","Colour"], answer:1,
+        explanation:"Feedback techniques reduce sensitivity to β variations and temperature." },
+
+      { q: "In design, if computed Q falls in saturation for the expected IB and RC, the designer should:", options:["Accept it","Increase RC or reduce IB to move Q into active region","Remove emitter resistor","Lower VCC to zero"], answer:1,
+        explanation:"To move Q out of saturation adjust RC, IB or supply so Q sits in active region for amplification." },
+
+      { q: "Which bias variant intentionally uses two supplies (VCC and VEE) to improve stability (slide mentions)?", options:["Single base bias","Emitter bias with dual supplies","No bias","Voltage doubler"], answer:1,
+        explanation:"Dual-supply emitter bias uses both rails to obtain stable Q less dependent on β." },
+
+      { q: "Which plot would be appropriate to illustrate load-line intersection with transistor family curves (this quiz includes such a plot)?", options:["I-V family with straight load line overlay","Bode plot","Nyquist plot","Only time domain"], answer:0,
+        answer_extra:null,
+        answer:0,
+        explanation:"I-V family curves plus load line show operating point intersections; the quiz draws this." , plot:{type:"load_line", params:{VCC:12, RC:2.2, VCE_max:12}}
+      }
+
+    ];
+
+    let cur = 0;
+    const userAnswers = new Array(questions.length);
+
+    function updateProgress() {
+      const ratio = ((cur) / questions.length) * 100;
+      document.getElementById('progress-bar').style.width = ratio + '%';
+    }
+
+    function render() {
+      const q = questions[cur];
+      document.getElementById('qnum').innerText = `Question ${cur+1} / ${questions.length}`;
+      document.getElementById('question-text').innerHTML = q.q;
+      const opts = document.getElementById('options');
+      opts.innerHTML = '';
+      q.options.forEach((o, i) => {
+        const div = document.createElement('div');
+        div.className = 'opt';
+        div.innerText = o;
+        div.onclick = () => selectOption(i);
+        if (userAnswers[cur] !== undefined) {
+          div.classList.toggle('selected', userAnswers[cur]===i);
+          if (userAnswers[cur]===q.answer) div.classList.add('correct');
+          else if (i===userAnswers[cur]) div.classList.add('wrong');
+          if (i===q.answer) div.classList.add('correct');
+        }
+        opts.appendChild(div);
+      });
+
+      const exp = document.getElementById('explanation');
+      exp.style.display = userAnswers[cur] === undefined ? 'none' : 'block';
+      exp.innerHTML = userAnswers[cur] === undefined ? '' : `<strong>Explanation:</strong> ${q.explanation}`;
+
+      const plotArea = document.getElementById('plot-area');
+      plotArea.style.display = q.plot ? 'block' : 'none';
+      if (q.plot) {
+        const c = document.getElementById('bias-plot');
+        c.width = Math.min(860, document.body.clientWidth - 60);
+        c.height = 300;
+        if (q.plot.type === 'load_line') drawLoadLine(c, q.plot.params);
+      }
+
+      updateProgress();
+      MathJax.typesetPromise();
+    }
+
+    function selectOption(i) {
+      userAnswers[cur] = i;
+      render();
+    }
+
+    document.getElementById('nextBtn').onclick = () => {
+      if (cur < questions.length - 1) { cur++; render(); }
+    };
+    document.getElementById('prevBtn').onclick = () => {
+      if (cur > 0) { cur--; render(); }
+    };
+    document.getElementById('revealBtn').onclick = () => {
+      userAnswers[cur] = questions[cur].answer;
+      render();
+    };
+    document.getElementById('finishBtn').onclick = finish;
+
+    function finish() {
+      let correct = 0;
+      questions.forEach((q,i) => { if (userAnswers[i] === q.answer) correct++; });
+      document.getElementById('quiz-area').style.display = 'none';
+      document.getElementById('final').style.display = 'block';
+      document.getElementById('score').innerHTML = `<strong>Score:</strong> ${correct} / ${questions.length} (${Math.round(correct/questions.length*100)}%)`;
+      const summary = document.getElementById('summary');
+      let html = '<ol>';
+      questions.forEach((q,i)=> {
+        const ok = userAnswers[i]===q.answer ? '✔' : '✖';
+        html += `<li><strong>${ok}</strong> ${q.q}<br><em>Your answer:</em> ${userAnswers[i]===undefined ? '—' : q.options[userAnswers[i]]} <br><em>Correct:</em> ${q.options[q.answer]}<br><em>Explanation:</em> ${q.explanation}</li><hr>`;
+      });
+      html += '</ol>';
+      summary.innerHTML = html;
+      window.scrollTo(0,0);
+    }
+
+    // Drawing a simple load line + family curves (illustrative)
+    function drawAxes(ctx, padL, padT, w, h, xlabel, ylabel) {
+      ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+      ctx.strokeStyle = '#666'; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padL, padT);
+      ctx.lineTo(padL, padT + h);
+      ctx.lineTo(padL + w, padT + h);
+      ctx.stroke();
+      ctx.fillStyle = '#333'; ctx.font = '12px Arial';
+      ctx.fillText(xlabel, padL + w - 80, padT + h + 18);
+      ctx.fillText(ylabel, padL - 36, padT + 10);
+    }
+
+    function drawLoadLine(canvas, params) {
+      const ctx = canvas.getContext('2d');
+      const padL = 50, padT = 30, w = canvas.width - 100, h = canvas.height - 90;
+      drawAxes(ctx, padL, padT, w, h, 'V_CE (V)', 'I_C (a.u.)');
+      // Draw family curves (three IB levels)
+      const Ib_levels = [1,2,4];
+      const colors = ['#1e40af','#059669','#b45309'];
+      for (let k=0;k<Ib_levels.length;k++){
+        ctx.strokeStyle = colors[k]; ctx.lineWidth = 2; ctx.beginPath();
+        for (let i=0;i<=200;i++){
+          const VCE = (i/200) * (params.VCE_max || 12);
+          const Ic = Ib_levels[k] * (1 - Math.exp(-VCE/1.0)); // illustrative
+          const x = padL + (VCE/(params.VCE_max||12))*w;
+          const y = padT + h - (Ic / (Ib_levels[Ib_levels.length-1]*1.1)) * h;
+          if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        }
+        ctx.stroke();
+        ctx.fillStyle = ctx.strokeStyle; ctx.font='12px Arial';
+        ctx.fillText(`I_B=${Ib_levels[k]} (arb)`, padL+8, padT+16 + k*14);
+      }
+      // Compute load line intercepts: when IC=0, VCE = VCC; when VCE=0, IC = VCC/RC
+      const VCC = params.VCC || 12;
+      const RC = params.RC || 2.2;
+      const VCE_cutoff = VCC;
+      const IC_sat = VCC / RC;
+      // draw load line
+      ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 1.5;
+      const x0 = padL + (0/(params.VCE_max||12))*w;
+      const y0 = padT + h - (IC_sat / (Ib_levels[Ib_levels.length-1]*1.1)) * h;
+      const x1 = padL + (VCE_cutoff/(params.VCE_max||12))*w;
+      const y1 = padT + h - (0 / (Ib_levels[Ib_levels.length-1]*1.1)) * h;
+      ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke();
+      ctx.fillStyle='#dc2626'; ctx.fillText(`Load line: VCC=${VCC}V, RC=${RC}Ω`, padL+8, padT + h + 6);
+      // approximate intersection with middle IB curve to show Q
+      const midIb = Ib_levels[1];
+      // find approximate VCE where Ic(midIb) = IC_from_load
+      let Qx=0,Qy=0;
+      for (let i=0;i<=200;i++){
+        const VCE = (i/200) * (params.VCE_max || 12);
+        const Ic_curve = midIb * (1 - Math.exp(-VCE/1.0));
+        const Ic_load = (VCC - VCE) / RC;
+        if (Math.abs(Ic_curve - Ic_load) < 0.05) { Qx = VCE; Qy = Ic_curve; break; }
+      }
+      if (Qx>0) {
+        const qx = padL + (Qx/(params.VCE_max||12))*w;
+        const qy = padT + h - (Qy / (Ib_levels[Ib_levels.length-1]*1.1)) * h;
+        ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(qx,qy,4,0,2*Math.PI); ctx.fill();
+        ctx.fillText(`Q ~ (${Qx.toFixed(2)} V, ${Qy.toFixed(2)} a.u.)`, qx+6, qy-6);
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>

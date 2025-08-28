@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>07_ElectronicsQuiz - Bipolar Transistors (BJT)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;max-width:980px;margin:18px auto;padding:12px;color:#222}
+    header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    h1{font-size:1.2rem;margin:0}
+    #progress{height:14px;background:#eee;border-radius:8px;overflow:hidden;margin:12px 0}
+    #progress > i{display:block;height:100%;background:#3b82f6;width:0%}
+    .question-card{border:1px solid #ddd;padding:16px;border-radius:8px;background:#fff}
+    .options{margin-top:12px;display:grid;grid-template-columns:1fr;gap:8px}
+    .opt{padding:10px;border-radius:6px;border:1px solid #ccc;cursor:pointer;background:#fafafa}
+    .opt.selected{border-color:#2563eb;background:#e6f0ff}
+    .opt.correct{border-color:#059669;background:#ecfdf5}
+    .opt.wrong{border-color:#dc2626;background:#fff1f2}
+    .controls{display:flex;gap:8px;justify-content:space-between;margin-top:14px}
+    .btn{padding:8px 12px;border-radius:6px;border:1px solid #888;background:#f3f4f6;cursor:pointer}
+    .btn.primary{background:#2563eb;color:#fff;border-color:#1e40af}
+    #explanation{margin-top:12px;padding:10px;border-left:4px solid #ddd;background:#fafafa;border-radius:4px}
+    #final{display:none;text-align:left;margin-top:20px}
+    canvas{border:1px solid #ddd;border-radius:4px;background:#fff;max-width:100%}
+    footer{margin-top:18px;font-size:0.9rem;color:#555}
+    .note{font-size:0.9rem;color:#444;margin-top:6px}
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Bipolar Junction Transistors (BJT) — Quiz</h1>
+    <div class="note">Based on ELECTRONICS/07_Dipolika_Transistors.pdf — English questions and explanations</div>
+  </header>
+
+  <div id="progress"><i id="progress-bar"></i></div>
+
+  <div id="quiz-area" class="question-card">
+    <div id="qnum"></div>
+    <div id="question-text" style="margin-top:8px"></div>
+
+    <div id="plot-area" style="margin-top:12px;display:none">
+      <canvas id="trans-plot" width="860" height="300"></canvas>
+    </div>
+
+    <div class="options" id="options"></div>
+
+    <div id="explanation" style="display:none"></div>
+
+    <div class="controls">
+      <div>
+        <button class="btn" id="prevBtn">Previous</button>
+        <button class="btn" id="nextBtn">Next</button>
+      </div>
+      <div>
+        <button class="btn" id="revealBtn">Reveal Answer</button>
+        <button class="btn primary" id="finishBtn">Finish</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="final" class="question-card">
+    <h2>Results</h2>
+    <div id="score"></div>
+    <div id="summary" style="margin-top:12px"></div>
+  </div>
+
+  <footer>
+    <div>UI and behavior modeled on MATHEMATICAL ANALYSIS/04_QizGame.html</div>
+  </footer>
+
+  <script>
+    const questions = [
+      { q: "Which three terminals does a BJT have?", options:["Gate, Drain, Source","Emitter, Base, Collector","Anode, Cathode, Gate","Source, Base, Drain"], answer:1, explanation:"A BJT has Emitter (E), Base (B) and Collector (C)." },
+
+      { q: "Which BJT type requires a positive V_C relative to E to operate in common configuration?", options:["PNP with positive V_C","NPN with positive V_C","MOSFET N-channel","Schottky diode only"], answer:1, explanation:"An NPN typically operates with collector positive relative to emitter." },
+
+      { q: "What is the basic current relation in active region for BJT?", options:["I_C = β × I_B","I_B = β × I_C","I_E = β × I_C","I_C = I_B + I_E"], answer:0, explanation:"In active region IC ≈ β·IB (β is current gain)." },
+
+      { q: "What does parameter α represent in a BJT?", options:["Voltage gain","Ratio I_C / I_E (~0.98–0.998)","Gate threshold","Collector-emitter breakdown voltage"], answer:1, explanation:"α = IC / IE, close to 1 for a BJT." },
+
+      { q: "Which region corresponds to transistor acting as a closed switch (saturated)?", options:["Cutoff","Active","Saturation (koro)","Reverse breakdown"], answer:2, explanation:"In saturation the transistor is fully on like a closed switch." },
+
+      { q: "Which region corresponds to transistor acting as an open switch (off)?", options:["Saturation","Active","Cutoff","Early region"], answer:2, explanation:"In cutoff IB≈0 and IC≈0 so transistor behaves like open switch." },
+
+      { q: "In the active region which emitter-base junction is biased and which base-collector junction is biased?", options:["BE reverse, BC forward","BE forward, BC reverse","Both reverse","Both forward"], answer:1, explanation:"Active: BE forward, BC reverse." },
+
+      { q: "What is Early effect in a BJT?", options:["Increase of β with temperature","Slight dependence of IC on VCE due to base-width modulation","Capacitance between base and emitter","Noise generation"], answer:1, explanation:"Early effect: IC depends weakly on VCE due to base width modulation; modelled by Early voltage V_A." },
+
+      { q: "Which common BJT configuration provides highest voltage gain among the three (CE, CC, CB)?", options:["Common-collector (emitter follower)","Common-base","Common-emitter","All equal"], answer:2, explanation:"Common-emitter provides highest voltage gain in typical amplifier designs." },
+
+      { q: "Which configuration is typically used as a buffer with unity voltage gain and high input impedance?", options:["Common-base","Common-emitter","Common-collector (emitter follower)","Cascode only"], answer:2, explanation:"Emitter follower (common-collector) has ~unity voltage gain and high input impedance." },
+
+      { q: "If IC = 10 mA and β = 100, what is IB approximately?", options:["1 A","100 mA","0.1 mA","0.1 A"], answer:2, explanation:"IB = IC/β = 10 mA / 100 = 0.1 mA." },
+
+      { q: "Which practical method helps identify transistor leads without datasheet?", options:["Look for a dot marking collector or use ohmmeter to find base","Assume middle pin is always base","Shake the transistor","Use a magnifier only"], answer:0, explanation:"Packages often have marks; an ohmmeter can locate base-emitter diode and identify leads." },
+
+      { q: "What happens to collector current when base current is interrupted (IB → 0)?", options:["IC increases","IC decreases to near zero (cutoff)","IC becomes infinite","Nothing"], answer:1, explanation:"If IB is removed, IC falls to near zero (cutoff region)." },
+
+      { q: "Which phenomenon defines the onset of large IC at high VCE (dangerous region)?", options:["Saturation","Cutoff","Avalanche or breakdown (collector-emitter breakdown)","Forward conduction"], answer:2, explanation:"High VCE can trigger avalanche leading to breakdown and damage." },
+
+      { q: "What is a typical value range for β (DC current gain) in small-signal BJTs?", options:["0.001–0.01","1–5","20–300","1000–5000"], answer:2, explanation:"Small-signal BJTs often have β between ~20 and a few hundred." },
+
+      { q: "Which equation relates α and β?", options:["α = β/(β+1)","β = α/(α+1)","α + β = 1","α = β − 1"], answer:0, explanation:"α = β/(β+1) and β = α/(1−α)." },
+
+      { q: "In graphical method to find β from I-V family curves we use:", options:["Slope of VCE axis","Ratio of collector currents between IB steps or IC/IB","Area under curve","Capacitance measurement"], answer:1, explanation:"β is found from IC vs IB: β = IC/IB for corresponding points." },
+
+      { q: "Which BJT terminal is usually connected to the heat-sink in power transistors?", options:["Base","Emitter","Collector","Gate"], answer:2, explanation:"Collector is often the package tab/heat-sink and tied to collector." },
+
+      { q: "Which of these is a typical application of BJT mentioned in slides?", options:["Acting as amplifier, switch and in digital logic","Only as light source","Only as sensor","Only for high-voltage power"], answer:0, explanation:"BJTs are used as amplifiers, switches and in many electronic circuits." },
+
+      { q: "What is the collector-emitter voltage V_CE definition?", options:["V_C - V_E","V_B - V_E","V_E - V_B","V_B - V_C"], answer:0, explanation:"V_CE = V_C − V_E." },
+
+      { q: "What is the main reason base is made thin and lightly doped?", options:["To reduce manufacturing cost","So majority carriers injected from emitter can diffuse to collector before recombining, enabling high gain","To increase voltage rating","To make transistor heavier"], answer:1, explanation:"Thin, lightly doped base allows carriers to reach collector, producing large IC from small IB." },
+
+      { q: "Which region of operation is used for linear amplification?", options:["Cutoff","Active region","Saturation","Breakdown"], answer:1, explanation:"Active region is used for linear amplification where IC ≈ β·IB." },
+
+      { q: "Which pair is complementary transistor pair used in push-pull amplifiers?", options:["Two NPN transistors","NPN and PNP","Two PNP transistors","MOSFET and Schottky"], answer:1, explanation:"Complementary pair uses NPN and PNP devices." },
+
+      { q: "Which simple test indicates a transistor is in saturation (as switch)?", options:["V_CE ≈ 0.1–0.3 V and V_BC > 0","V_CE large and IB zero","Collector open","Base reversed"], answer:0, explanation:"Saturated transistor has small VCE and base-collector forward biased." },
+
+      { q: "What does the family of collector curves (IC vs VCE for different IB) illustrate?", options:["Temperature dependence only","How IC varies with VCE for fixed IB and shows active, saturation and breakdown regions","Only base-emitter diode behavior","Only resistor-like behaviour"], answer:1, explanation:"Family curves show IC vs VCE for several IB values, indicating operating regions and Early effect." ,
+
+        plot:{type:"bjt_family", params:{Ib_steps:[2,4,8], VCE_max:10}}
+      },
+
+      { q: "For DC biasing checks the slides propose assuming V_BE ≈", options:["0.1 V","0.7 V","5 V","12 V"], answer:1, explanation:"For silicon BJTs V_BE ≈ 0.7 V when forward biased; slides use this approximation for DC checks." }
+    ];
+
+    let cur = 0;
+    const userAnswers = new Array(questions.length);
+
+    function updateProgress() {
+      const ratio = ((cur) / questions.length) * 100;
+      document.getElementById('progress-bar').style.width = ratio + '%';
+    }
+
+    function render() {
+      const q = questions[cur];
+      document.getElementById('qnum').innerText = `Question ${cur+1} / ${questions.length}`;
+      document.getElementById('question-text').innerHTML = q.q;
+      const opts = document.getElementById('options');
+      opts.innerHTML = '';
+      q.options.forEach((o, i) => {
+        const div = document.createElement('div');
+        div.className = 'opt';
+        div.innerText = o;
+        div.onclick = () => selectOption(i);
+        if (userAnswers[cur] !== undefined) {
+          div.classList.toggle('selected', userAnswers[cur]===i);
+          if (userAnswers[cur]===q.answer) div.classList.add('correct');
+          else if (i===userAnswers[cur]) div.classList.add('wrong');
+          if (i===q.answer) div.classList.add('correct');
+        }
+        opts.appendChild(div);
+      });
+
+      const exp = document.getElementById('explanation');
+      exp.style.display = userAnswers[cur] === undefined ? 'none' : 'block';
+      exp.innerHTML = userAnswers[cur] === undefined ? '' : `<strong>Explanation:</strong> ${q.explanation}`;
+
+      const plotArea = document.getElementById('plot-area');
+      plotArea.style.display = q.plot ? 'block' : 'none';
+      if (q.plot) {
+        const c = document.getElementById('trans-plot');
+        c.width = Math.min(860, document.body.clientWidth - 60);
+        c.height = 300;
+        if (q.plot.type === 'bjt_family') drawBJTFamily(c, q.plot.params);
+      }
+
+      updateProgress();
+      MathJax.typesetPromise();
+    }
+
+    function selectOption(i) {
+      userAnswers[cur] = i;
+      render();
+    }
+
+    document.getElementById('nextBtn').onclick = () => {
+      if (cur < questions.length - 1) { cur++; render(); }
+    };
+    document.getElementById('prevBtn').onclick = () => {
+      if (cur > 0) { cur--; render(); }
+    };
+    document.getElementById('revealBtn').onclick = () => {
+      userAnswers[cur] = questions[cur].answer;
+      render();
+    };
+    document.getElementById('finishBtn').onclick = finish;
+
+    function finish() {
+      let correct = 0;
+      questions.forEach((q,i) => { if (userAnswers[i] === q.answer) correct++; });
+      document.getElementById('quiz-area').style.display = 'none';
+      document.getElementById('final').style.display = 'block';
+      document.getElementById('score').innerHTML = `<strong>Score:</strong> ${correct} / ${questions.length} (${Math.round(correct/questions.length*100)}%)`;
+      const summary = document.getElementById('summary');
+      let html = '<ol>';
+      questions.forEach((q,i)=> {
+        const ok = userAnswers[i]===q.answer ? '✔' : '✖';
+        html += `<li><strong>${ok}</strong> ${q.q}<br><em>Your answer:</em> ${userAnswers[i]===undefined ? '—' : q.options[userAnswers[i]]} <br><em>Correct:</em> ${q.options[q.answer]}<br><em>Explanation:</em> ${q.explanation}</li><hr>`;
+      });
+      html += '</ol>';
+      summary.innerHTML = html;
+      window.scrollTo(0,0);
+    }
+
+    // Drawing BJT family curves (illustrative)
+    function drawAxes(ctx, padL, padT, w, h, xlab, ylab) {
+      ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+      ctx.strokeStyle = '#666'; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padL, padT);
+      ctx.lineTo(padL, padT + h);
+      ctx.lineTo(padL + w, padT + h);
+      ctx.stroke();
+      ctx.fillStyle = '#333'; ctx.font = '12px Arial';
+      ctx.fillText(xlab, padL + w - 60, padT + h + 18);
+      ctx.fillText(ylab, padL - 36, padT + 10);
+    }
+
+    function drawBJTFamily(canvas, params) {
+      const ctx = canvas.getContext('2d');
+      const padL = 50, padT = 30, w = canvas.width - 100, h = canvas.height - 90;
+      drawAxes(ctx, padL, padT, w, h, 'V_{CE} (V)', 'I_C (a.u.)');
+      const colors = ['#1e40af','#059669','#b45309','#7c3aed'];
+      const Ib_steps = params.Ib_steps || [1,2,4];
+      for (let k=0;k<Ib_steps.length;k++){
+        ctx.strokeStyle = colors[k%colors.length]; ctx.lineWidth = 2; ctx.beginPath();
+        for (let i=0;i<=200;i++){
+          const VCE = (i/200) * (params.VCE_max || 10);
+          // simple model: IC ≈ k*Ib * (1 - exp(-VCE/1.5)) to simulate saturation/active (illustrative)
+          const scale = Ib_steps[k];
+          const Ic = scale * (1 - Math.exp(-VCE/1.2));
+          const x = padL + (VCE / (params.VCE_max || 10)) * w;
+          const y = padT + h - (Ic / (Ib_steps[Ib_steps.length-1] * 1.1)) * h;
+          if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        }
+        ctx.stroke();
+        // label curve
+        ctx.fillStyle = ctx.strokeStyle; ctx.font='12px Arial';
+        ctx.fillText(`I_B=${Ib_steps[k]} (arb)`, padL + 8, padT + 16 + k*14);
+      }
+      // draw load line example
+      ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 1.5; ctx.beginPath();
+      const VCE0 = 0, Ic0 = 0;
+      const VCE1 = params.VCE_max || 10;
+      const Ic1 = 1.0; // arbitrary intercept
+      const x0 = padL + (VCE0/(params.VCE_max||10))*w;
+      const y0 = padT + h - (Ic1 / (Ib_steps[Ib_steps.length-1]*1.1))*h;
+      const x1 = padL + (VCE1/(params.VCE_max||10))*w;
+      const y1 = padT + h - (0 / (Ib_steps[Ib_steps.length-1]*1.1))*h;
+      ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke();
+      ctx.fillStyle='#dc2626'; ctx.fillText('Example load line', x1-120, y1-6);
+    }
+
+    render();
+  </script>
+</body>
+</html>

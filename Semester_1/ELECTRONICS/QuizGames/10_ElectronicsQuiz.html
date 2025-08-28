@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>10_ElectronicsQuiz - Course Summary</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; margin: 16px; background:#f5f7fb; color:#222; }
+    .container { max-width:900px; margin:0 auto; background:#fff; padding:20px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.08); }
+    h1 { margin:0 0 8px; font-size:20px; }
+    #progress { width:100%; height:12px; background:#eee; border-radius:6px; overflow:hidden; margin:12px 0; }
+    #progress-bar { height:100%; width:0%; background:linear-gradient(90deg,#4caf50,#2b9d8f); transition:width 200ms ease; }
+    #qnum { font-weight:600; margin-bottom:6px; display:block; }
+    #question-card { padding:12px; border-radius:6px; border:1px solid #e6e9ef; background:#fbfcfe; }
+    .opts { margin-top:12px; display:grid; grid-template-columns:1fr; gap:8px; }
+    .opt { padding:10px; border-radius:6px; border:1px solid #d7dbe6; cursor:pointer; background:#fff; transition:background 120ms, border-color 120ms; }
+    .opt:hover { background:#f0f6ff; }
+    .opt.selected { border-color:#2b9d8f; box-shadow:0 2px 6px rgba(43,157,143,0.12); }
+    .opt.correct { border-color:#4caf50; background:#e9f8ef; }
+    .opt.wrong { border-color:#e04b4b; background:#fff0f0; }
+    #controls { display:flex; gap:8px; margin-top:14px; }
+    button { padding:8px 10px; border-radius:6px; border:1px solid #cbd5e1; background:#f8fafc; cursor:pointer; }
+    button.primary { background:#2b9d8f; color:white; border-color:#23826f; }
+    #explanation { margin-top:10px; padding:10px; border-radius:6px; background:#fbfbfb; border:1px solid #eef2f7; display:none; }
+    #canvas-wrap { margin-top:10px; display:none; }
+    canvas { width:100%; height:260px; border:1px solid #e6e9ef; border-radius:6px; background:#fff; }
+    #result { display:none; padding:12px; }
+    .summary-item { padding:10px; border-radius:6px; margin-bottom:8px; border:1px solid #eef2f7; background:#fff; }
+    .meta { color:#6b7280; font-size:13px; }
+  </style>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Electronics — Course Summary Quiz</h1>
+    <span id="qnum">Question 1 / 24</span>
+    <div id="progress"><div id="progress-bar"></div></div>
+
+    <div id="question-card">
+      <div id="question-text"></div>
+
+      <div id="canvas-wrap">
+        <canvas id="plot-canvas"></canvas>
+      </div>
+
+      <div class="opts" id="options"></div>
+
+      <div id="explanation"></div>
+
+      <div id="controls">
+        <button id="prev-btn">Prev</button>
+        <button id="next-btn">Next</button>
+        <button id="reveal-btn">Reveal</button>
+        <button id="finish-btn" class="primary">Finish</button>
+      </div>
+    </div>
+
+    <div id="result">
+      <h2>Results</h2>
+      <p class="meta" id="score-text"></p>
+      <div id="summary-list"></div>
+    </div>
+  </div>
+
+  <script>
+    // Questions cover Ohm's law, circuit methods, PN junction, diodes, Zener, rectifiers, transistors, biasing, amplifiers.
+    const questions = [
+      { q: "Ohm's law states the relationship between voltage (V), current (I) and resistance (R). Which expression is correct?", 
+        options:["V = I/R","V = IR","I = V + R","R = V + I"], answer:1,
+        explanation:"Ohm's law: V = I·R (voltage equals current times resistance)." },
+
+      { q: "For two resistors R1 and R2 in series, which of the following is the equivalent resistance?", 
+        options:["R1·R2/(R1+R2)","R1+R2","(R1+R2)/2","max(R1,R2)"], answer:1,
+        explanation:"Series resistances add: R_eq = R1 + R2." },
+
+      { q: "For two resistors in parallel, R_eq equals:", 
+        options:["R1 + R2","(R1·R2)/(R1+R2)","R1·R2","R1/R2"], answer:1,
+        explanation:"Parallel resistances: R_eq = (R1·R2)/(R1+R2)." },
+
+      { q: "Nodal analysis uses which primary law to set up equations at nodes?", 
+        options:["Ohm's law only","Kirchhoff's Current Law (KCL)","Kirchhoff's Voltage Law (KVL)","Thevenin's theorem"], answer:1,
+        explanation:"Nodal analysis is based on KCL: sum of currents leaving/entering a node is zero." },
+
+      { q: "Mesh (loop) analysis primarily uses which law?", 
+        options:["KCL","Ohm's law","KVL","Norton theorem"], answer:2,
+        explanation:"Mesh analysis is based on KVL (sum of voltages around a loop = 0)." },
+
+      { q: "A PN junction diode under forward bias: which is true about the depletion region and current?", 
+        options:["Depletion width increases and current decreases","Depletion width shrinks and forward current increases","Depletion width shrinks and current zero","Depletion width increases and current increases"], answer:1,
+        explanation:"Forward bias reduces the depletion region width, allowing charge carriers to cross—current increases." },
+
+      { q: "Which curve best describes an ideal diode's I–V characteristic in forward region?", 
+        options:["Linear","Exponential","Parabolic","Logarithmic"], answer:1,
+        explanation:"Diode forward I-V follows an exponential relation: I ≈ I_s (e^{V/(nV_T)} -1)." ,
+        plot:{type:'diode_iv'} },
+
+      { q: "A Zener diode used as a voltage regulator is operated in:", 
+        options:["Forward conduction region only","Reverse breakdown region at rated Zener voltage","Cutoff region exclusively","Avalanche region above Pmax"], answer:1,
+        explanation:"Zener diodes are used in reverse breakdown at their specified Zener voltage for regulation." ,
+        plot:{type:'zener_iv'} },
+
+      { q: "In a simple Zener shunt regulator, increasing the load current (keeping supply constant) will:", 
+        options:["Always increase the output voltage","Reduce the current through Zener and may cause Vout to drop if limit reached","Cause the Zener to conduct more and increase Vout","Not affect regulation"], answer:1,
+        explanation:"Higher load current reduces current available to Zener; if Zener current falls below minimum, regulation fails and Vout may drop." },
+
+      { q: "A half-wave rectifier with a series diode and RL load produces which DC output characteristic?", 
+        options:["Continuous DC with no ripple","Pulsating DC with large ripple at mains frequency","Pure AC","DC at twice mains frequency"], answer:1,
+        explanation:"Half-wave rectifier outputs a pulsating DC with gaps (large ripple)." ,
+        plot:{type:'rectifier', mode:'half'} },
+
+      { q: "A full-wave bridge rectifier (no center tap) outputs pulsating DC with frequency:", 
+        options:["Same as AC input frequency","Twice the AC frequency","Half the AC frequency","One quarter of AC frequency"], answer:1,
+        explanation:"Full-wave rectification inverts negative halves, yielding output at 2× input frequency." ,
+        plot:{type:'rectifier', mode:'bridge'} },
+
+      { q: "Peak Inverse Voltage (PIV) for a single diode in a half-wave rectifier equals approximately:", 
+        options:["Vpeak","2·Vpeak","Vpeak/2","Zero"], answer:1,
+        explanation:"The diode must withstand the full negative peak across the source: PIV ≈ Vpeak (for simple single-diode half-wave relative to ground). For some configurations with transformer references PIV calculations differ." },
+
+      { q: "A capacitor-input filter (smoothing capacitor) after a rectifier primarily acts to:", 
+        options:["Reduce average value","Store charge and reduce ripple by supplying current between peaks","Increase ripple","Block DC"], answer:1,
+        explanation:"The smoothing capacitor charges on peaks and supplies current between peaks, reducing ripple." ,
+        plot:{type:'rectifier', mode:'filtered'} },
+
+      { q: "A diode's forward drop depends on current. For a silicon diode typical forward voltage around moderate currents is:", 
+        options:["~0.01 V","~0.7 V","~2.5 V","~5 V"], answer:1,
+        explanation:"A typical silicon diode forward drop is around 0.6–0.8 V at moderate forward current." },
+
+      { q: "Schottky diodes are chosen over silicon PN diodes when:", 
+        options:["Higher forward voltage is required","Lower forward voltage and faster switching are required","Higher reverse breakdown is needed","AC coupling only"], answer:1,
+        explanation:"Schottky diodes have lower forward voltage drop and faster switching (no minority-carrier storage)." },
+
+      { q: "In BJT transistor nomenclature, β (beta) equals:", 
+        options:["I_C / I_B","I_B / I_C","I_E / I_C","V_CE / I_C"], answer:0,
+        explanation:"DC current gain β = I_C / I_B." },
+
+      { q: "Which region corresponds to normal active operation for an NPN BJT amplifier?", 
+        options:["Emitter-base reverse, base-collector reverse","Emitter-base forward, base-collector reverse (forward-active)","Both junctions forward (saturation)","Both junctions reverse (cutoff)"], answer:1,
+        explanation:"Forward-active: base-emitter forward, base-collector reverse — transistor acts as amplifier." ,
+        plot:{type:'loadline'} },
+
+      { q: "Load line intersection with transistor family curves gives:", 
+        options:["The diode threshold voltage","The transistor Q-point (operating I_C and V_CE)","The supply ripple frequency","The Zener voltage"], answer:1,
+        explanation:"Intersection of load line with device characteristic determines the transistor operating point (Q-point)." },
+
+      { q: "A voltage-divider bias (emitter biased with a bypass capacitor absent) primarily provides:", 
+        options:["Very unstable operating point","A stable DC bias largely independent of β","No DC bias at all","AC gain reduction only"], answer:1,
+        explanation:"Voltage divider bias provides stable DC bias, less dependent on β variations." },
+
+      { q: "Small-signal transconductance g_m of a BJT in forward-active region (approx) is:", 
+        options:["g_m ≈ I_C / V_T","g_m ≈ V_T / I_C","g_m ≈ β·I_B","g_m ≈ 1/R_C"], answer:0,
+        explanation:"g_m ≈ I_C / V_T where V_T ≈ 25 mV at room temperature." ,
+        plot:{type:'gm_vs_ic'} },
+
+      { q: "A coupling capacitor between amplifier stages is used to:", 
+        options:["Isolate DC bias between stages while passing AC signal","Increase DC gain","Short-circuit power supply","Reduce input impedance only"], answer:0,
+        explanation:"Coupling capacitors pass AC signals but block DC, preserving individual stage bias points." },
+
+      { q: "Bypass capacitor across emitter resistor (large value) in a common-emitter amplifier does what for AC gain?", 
+        options:["Decreases AC gain","Increases AC gain by providing low AC emitter impedance","No effect","Destroys DC bias"], answer:1,
+        explanation:"Bypass capacitor reduces emitter degeneration for AC, increasing gain while DC bias remains set by resistor." },
+
+      { q: "Thevenin equivalent of a source plus series resistors is helpful to:", 
+        options:["Compute mesh currents faster","Simplify a network to a single voltage source and series resistance seen by a load","Eliminate reactive elements","Only for AC circuits"], answer:1,
+        explanation:"Thevenin theorem replaces network by single V_th and R_th seen by the load for easier analysis." },
+
+      { q: "When designing an amplifier, thermal stability of the quiescent point is improved by:", 
+        options:["Removing emitter resistor","Adding negative feedback (emitter resistor) and using bias stabilization","Using zero bypass capacitance only","Shorting base to ground"], answer:1,
+        explanation:"Negative feedback via emitter resistor and proper biasing improves thermal stability of Q-point." }
+    ];
+
+    let cur = 0;
+    const userAnswers = new Array(questions.length).fill(null);
+    const answered = new Array(questions.length).fill(false);
+
+    function render() {
+      const q = questions[cur];
+      document.getElementById('qnum').innerText = `Question ${cur+1} / ${questions.length}`;
+      const qtext = document.getElementById('question-text');
+      qtext.innerHTML = q.q;
+      const opts = document.getElementById('options');
+      opts.innerHTML = '';
+      q.options.forEach((opt, i) => {
+        const d = document.createElement('div');
+        d.className = 'opt';
+        d.innerHTML = `<strong>${String.fromCharCode(65+i)}.</strong> ${opt}`;
+        d.onclick = () => selectOption(i);
+        if (userAnswers[cur] === i) d.classList.add('selected');
+        // If revealed show correct/wrong
+        if (answered[cur]) {
+          if (i === q.answer) d.classList.add('correct');
+          else if (userAnswers[cur] === i && i !== q.answer) d.classList.add('wrong');
+        }
+        opts.appendChild(d);
+      });
+
+      // Explanation display
+      const exp = document.getElementById('explanation');
+      if (answered[cur]) {
+        exp.style.display = 'block';
+        exp.innerHTML = `<strong>Explanation:</strong> ${q.explanation || ''}`;
+      } else {
+        exp.style.display = 'none';
+        exp.innerHTML = '';
+      }
+
+      // Plot logic
+      const cw = document.getElementById('canvas-wrap');
+      const canvas = document.getElementById('plot-canvas');
+      if (q.plot) {
+        cw.style.display = 'block';
+        canvas.width = canvas.clientWidth * devicePixelRatio;
+        canvas.height = canvas.clientHeight * devicePixelRatio;
+        drawPlot(canvas, q.plot);
+      } else {
+        cw.style.display = 'none';
+      }
+
+      updateProgress();
+      // MathJax typeset
+      if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+    }
+
+    function selectOption(i) {
+      userAnswers[cur] = i;
+      answered[cur] = true;
+      render();
+    }
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+      if (cur < questions.length - 1) { cur++; render(); }
+    });
+
+    document.getElementById('prev-btn').addEventListener('click', () => {
+      if (cur > 0) { cur--; render(); }
+    });
+
+    document.getElementById('reveal-btn').addEventListener('click', () => {
+      answered[cur] = true;
+      render();
+    });
+
+    document.getElementById('finish-btn').addEventListener('click', finish);
+
+    function updateProgress() {
+      const ratio = (cur / (questions.length - 1)) * 100;
+      document.getElementById('progress-bar').style.width = ratio + '%';
+    }
+
+    function finish() {
+      let score = 0;
+      for (let i=0;i<questions.length;i++){
+        if (userAnswers[i] === questions[i].answer) score++;
+        answered[i] = true;
+      }
+      const percent = Math.round((score / questions.length) * 100);
+      document.getElementById('score-text').innerText = `Score: ${score} / ${questions.length} (${percent}%)`;
+      // summary
+      const summary = document.getElementById('summary-list');
+      summary.innerHTML = '';
+      for (let i=0;i<questions.length;i++){
+        const item = document.createElement('div');
+        item.className = 'summary-item';
+        const st = (userAnswers[i] === questions[i].answer) ? '<strong style="color:green">Correct</strong>' : '<strong style="color:red">Wrong</strong>';
+        item.innerHTML = `<div><strong>Q${i+1}.</strong> ${questions[i].q}</div>
+          <div class="meta">Your answer: ${userAnswers[i]!==null?String.fromCharCode(65+userAnswers[i]):'—'} — Correct: ${String.fromCharCode(65+questions[i].answer)} — ${st}</div>
+          <div style="margin-top:6px">${questions[i].explanation || ''}</div>`;
+        summary.appendChild(item);
+      }
+      document.getElementById('result').style.display = 'block';
+      window.scrollTo(0,0);
+    }
+
+    // Plotting helpers (simple illustrative sketches)
+    function drawPlot(canvas, spec) {
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0,0,w,h);
+      ctx.scale(devicePixelRatio, devicePixelRatio);
+      // Draw axes
+      ctx.save();
+      ctx.strokeStyle = '#cfd8e3';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(40, h/2 - 10);
+      ctx.lineTo(w/ (devicePixelRatio) - 10, h/2 - 10);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(40, 10);
+      ctx.lineTo(40, h/ (devicePixelRatio) - 10);
+      ctx.stroke();
+      ctx.restore();
+
+      if (spec.type === 'diode_iv') drawDiodeIV(ctx, canvas);
+      else if (spec.type === 'zener_iv') drawZenerIV(ctx, canvas);
+      else if (spec.type === 'rectifier') drawRectified(ctx, canvas, spec.mode);
+      else if (spec.type === 'loadline') drawLoadLine(ctx, canvas);
+      else if (spec.type === 'gm_vs_ic') drawGmVsIc(ctx, canvas);
+    }
+
+    function drawDiodeIV(ctx, canvas) {
+      const cw = canvas.width / devicePixelRatio;
+      const ch = canvas.height / devicePixelRatio;
+      ctx.save();
+      ctx.translate(40, 10);
+      ctx.strokeStyle = '#2b6fb0';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      // Exponential-like curve
+      for (let x=0;x<cw-60;x++){
+        const vx = x/(cw-60)*0.8; // 0..0.8V
+        const y = (1 - Math.exp(-vx*8)) * (ch-40) * 0.9;
+        if (x===0) ctx.moveTo(x, ch-40 - y);
+        else ctx.lineTo(x, ch-40 - y);
+      }
+      ctx.stroke();
+      // axes labels
+      ctx.fillStyle='#333'; ctx.font='12px Arial';
+      ctx.fillText('V (V)', cw-110, ch-14);
+      ctx.fillText('I', -20, 12);
+      ctx.restore();
+    }
+
+    function drawZenerIV(ctx, canvas) {
+      const cw = canvas.width / devicePixelRatio;
+      const ch = canvas.height / devicePixelRatio;
+      ctx.save();
+      ctx.translate(40, 10);
+      // Forward exponential
+      ctx.strokeStyle = '#2b6fb0';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let x=0;x<cw-60;x++){
+        const vx = x/(cw-60)*0.8;
+        const y = (1 - Math.exp(-vx*8)) * (ch-40) * 0.8;
+        if (x===0) ctx.moveTo(x, ch-40 - y);
+        else ctx.lineTo(x, ch-40 - y);
+      }
+      ctx.stroke();
+      // Reverse breakdown region sketch
+      ctx.strokeStyle = '#c0392b';
+      ctx.beginPath();
+      const bx = Math.floor((cw-60) * 0.45);
+      ctx.moveTo(bx, ch-40);
+      for (let x=bx;x<cw-60;x++){
+        const y = (1 - Math.exp(-(x-bx)/20)) * (ch-40) * 0.6;
+        ctx.lineTo(x, ch-40 + y*0.6);
+      }
+      ctx.stroke();
+      ctx.fillStyle='#333'; ctx.font='12px Arial';
+      ctx.fillText('V (reverse) →', cw-120, ch-14);
+      ctx.fillText('I', -20, 12);
+      ctx.restore();
+    }
+
+    function drawRectified(ctx, canvas, mode) {
+      const cw = canvas.width / devicePixelRatio;
+      const ch = canvas.height / devicePixelRatio;
+      ctx.save();
+      ctx.translate(40,10);
+      ctx.strokeStyle='#2b6fb0';
+      ctx.lineWidth=2;
+      const freq = 6;
+      ctx.beginPath();
+      for (let x=0;x<cw-60;x++){
+        const t = (x/(cw-60)) * Math.PI * 4;
+        let v = Math.sin(t);
+        if (mode === 'half') v = Math.max(0, v);
+        else if (mode === 'bridge') v = Math.abs(v);
+        else if (mode === 'filtered') v = Math.abs(v) * (0.5 + 0.5 * Math.cos(t*0.08));
+        const y = ch-40 - (v* (ch-60) * 0.9);
+        if (x===0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.fillStyle='#333'; ctx.font='12px Arial';
+      ctx.fillText(mode === 'half' ? 'Half-wave' : mode === 'bridge' ? 'Full-wave (bridge)' : 'Full-wave filtered', 10, ch-8);
+      ctx.restore();
+    }
+
+    function drawLoadLine(ctx, canvas) {
+      const cw = canvas.width / devicePixelRatio;
+      const ch = canvas.height / devicePixelRatio;
+      ctx.save();
+      ctx.translate(40,10);
+      // family curves (sketch)
+      ctx.strokeStyle='#9b59b6';
+      for (let k=0;k<5;k++){
+        ctx.beginPath();
+        for (let x=0;x<cw-60;x++){
+          const slope = 0.0008 + k*0.0006;
+          const y = Math.log(1 + x/30) * (ch-80) * slope * 80;
+          if (x===0) ctx.moveTo(x, ch-40 - y);
+          else ctx.lineTo(x, ch-40 - y);
+        }
+        ctx.stroke();
+      }
+      // load line
+      ctx.strokeStyle='#e67e22'; ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.moveTo(0, 10);
+      ctx.lineTo(cw-60, ch-40);
+      ctx.stroke();
+      ctx.fillStyle='#333'; ctx.font='12px Arial';
+      ctx.fillText('Load line (orange) intersects family curves → Q point', 6, ch-8);
+      ctx.restore();
+    }
+
+    function drawGmVsIc(ctx, canvas) {
+      const cw = canvas.width / devicePixelRatio;
+      const ch = canvas.height / devicePixelRatio;
+      ctx.save();
+      ctx.translate(40,10);
+      ctx.strokeStyle='#2b9d8f';
+      ctx.lineWidth=2;
+      ctx.beginPath();
+      for (let x=0;x<cw-60;x++){
+        const ic = (x/(cw-60)) * 20; // mA
+        const gm = ic / 25; // mA -> approx mS (Vt~25mV)
+        const y = ch-40 - (gm * (ch-60) * 0.8 / 1.0);
+        if (x===0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.fillStyle='#333'; ctx.font='12px Arial';
+      ctx.fillText('g_m vs I_C (approx)', 10, ch-8);
+      ctx.restore();
+    }
+
+    // initial render
+    render();
+  </script>
+</body>
+</html>

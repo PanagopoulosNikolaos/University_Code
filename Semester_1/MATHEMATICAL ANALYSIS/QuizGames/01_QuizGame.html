@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Functions Quiz (Part A)</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .quiz-container {
+            padding: 40px;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .question-container.current {
+            border-color: #667eea;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafafa;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .option.correct {
+            background: #4caf50 !important;
+            color: white !important;
+            border-color: #4caf50 !important;
+        }
+
+        .option.incorrect {
+            background: #f44336 !important;
+            color: white !important;
+            border-color: #f44336 !important;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .feedback.correct {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border-left: 5px solid #4caf50;
+        }
+
+        .feedback.incorrect {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 5px solid #f44336;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+            padding: 20px 0;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .results {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .results h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .final-score {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .score-excellent { color: #4caf50; }
+        .score-good { color: #ff9800; }
+        .score-poor { color: #f44336; }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .quiz-container {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Functions Quiz (Part A)</h1>
+            <p>Test your knowledge of basic function concepts</p>
+        </div>
+
+        <div id="quiz-container" class="quiz-container">
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div id="score-display" class="score-display">Score: 0/20</div>
+            
+            <div id="questions-container"></div>
+            
+            <div class="controls">
+                <button id="prev-btn" class="btn btn-secondary" onclick="previousQuestion()" disabled>Previous</button>
+                <button id="next-btn" class="btn btn-primary" onclick="nextQuestion()">Next</button>
+                <button id="submit-btn" class="btn btn-primary hidden" onclick="submitQuiz()">Submit Quiz</button>
+            </div>
+        </div>
+
+        <div id="results-container" class="results hidden">
+            <h2>🎉 Quiz Complete!</h2>
+            <div id="final-score" class="final-score">0/20</div>
+            <p id="score-message"></p>
+            <button class="btn btn-primary" onclick="restartQuiz()">Take Quiz Again</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "What is the definition of a function $f$ from a set $X$ to a set $Y$?",
+                options: [
+                    "A relation that connects some elements of $X$ with some elements of $Y$.",
+                    "A relation that connects each element of $X$ with exactly one element of $Y$.",
+                    "A relation that connects each element of $Y$ with exactly one element of $X$.",
+                    "A relation that connects every element of $X$ with at least one element of $Y$."
+                ],
+                correct: 1,
+                explanation: "A function $f$ from $X$ to $Y$ is a rule that assigns to each element $x$ in $X$ exactly one element $y$ in $Y$."
+            },
+            {
+                question: "In the expression $y = f(x)$, what is '$x$' called?",
+                options: [
+                    "Dependent variable",
+                    "Output",
+                    "Independent variable",
+                    "Range"
+                ],
+                correct: 2,
+                explanation: "'$x$' is the independent variable or the input of the function."
+            },
+            {
+                question: "What is the 'domain' of a function?",
+                options: [
+                    "The set of all possible output values.",
+                    "The set of input values for which the function is defined.",
+                    "The set of all real numbers.",
+                    "The graph of the function."
+                ],
+                correct: 1,
+                explanation: "The domain of a function is the set of all possible input values ($x$-values) for which the function has a meaningful output."
+            },
+            {
+                question: "What is the 'range' of a function?",
+                options: [
+                    "The set of all possible input values.",
+                    "The set of all output values ($f(x)$) produced by the function.",
+                    "The set of integers.",
+                    "The x-axis."
+                ],
+                correct: 1,
+                explanation: "The range of a function is the set of all possible output values ($y$-values or $f(x)$) that the function can produce."
+            },
+            {
+                question: "Which of the following is NOT a way to express a function?",
+                options: [
+                    "With a formula (analytical expression).",
+                    "With a table of values.",
+                    "With a graphical representation.",
+                    "With a single point."
+                ],
+                correct: 3,
+                explanation: "Functions can be expressed with a formula, a table of values, or a graph. A single point is not enough to define a function over a domain."
+            },
+            {
+                question: "What is the vertical line test used for?",
+                options: [
+                    "To find the domain of a function.",
+                    "To determine if a graph represents a function.",
+                    "To find the range of a function.",
+                    "To check if a function is linear."
+                ],
+                correct: 1,
+                explanation: "The vertical line test states that a graph represents a function if and only if no vertical line intersects the graph at more than one point."
+            },
+            {
+                question: "Which of the following graphs represents a function?",
+                options: [
+                    "A circle",
+                    "A sideways parabola",
+                    "An 'S' shaped curve",
+                    "An upward-opening parabola"
+                ],
+                correct: 3,
+                explanation: "An upward-opening parabola is the only graph that passes the vertical line test, as any vertical line will intersect it at most once."
+            },
+            {
+                question: "What is the domain of the function $f(x) = x^2 + 1$?",
+                options: [
+                    "$[1, \\infty)$",
+                    "$(-\\infty, \\infty)$ or $\\mathbb{R}$",
+                    "$[0, \\infty)$",
+                    "All positive integers."
+                ],
+                correct: 1,
+                explanation: "The function $f(x) = x^2 + 1$ is a polynomial, which is defined for all real numbers. Therefore, its domain is $\\mathbb{R}$."
+            },
+            {
+                question: "What is the range of the function $f(x) = x^2 + 1$?",
+                options: [
+                    "$(-\\infty, \\infty)$",
+                    "$[0, \\infty)$",
+                    "$[1, \\infty)$",
+                    "All integers."
+                ],
+                correct: 2,
+                explanation: "Since $x^2 \\ge 0$ for all real x, then $x^2 + 1 \\ge 1$. So, the range of the function is $[1, \\infty)$."
+            },
+            {
+                question: "What is the name of the function $f(x) = x$?",
+                options: [
+                    "Constant function",
+                    "Identity function",
+                    "Absolute value function",
+                    "Square function"
+                ],
+                correct: 1,
+                explanation: "The function $f(x) = x$ is called the identity function because the output is identical to the input."
+            },
+            {
+                question: "What is the name of the function $f(x) = k$, where k is a constant?",
+                options: [
+                    "Linear function",
+                    "Identity function",
+                    "Constant function",
+                    "Power function"
+                ],
+                correct: 2,
+                explanation: "The function $f(x) = k$ is a constant function because its output value is always the same, regardless of the input."
+            },
+            {
+                question: "The function $f(x) = x^n$ where n is a positive integer is called a...",
+                options: [
+                    "Root function",
+                    "Exponential function",
+                    "Logarithmic function",
+                    "Power function"
+                ],
+                correct: 3,
+                explanation: "A function of the form $f(x) = x^n$ where n is a positive integer is known as a power function."
+            },
+            {
+                question: "What is the domain of the function $f(x) = \\sqrt{x}$?",
+                options: [
+                    "$(-\\infty, \\infty)$",
+                    "$(0, \\infty)$",
+                    "$[0, \\infty)$",
+                    "All integers."
+                ],
+                correct: 2,
+                explanation: "The square root function is only defined for non-negative numbers. Therefore, the domain is $[0, \\infty)$."
+            },
+            {
+                question: "What is the domain of the function $f(x) = 1/x$?",
+                options: [
+                    "All real numbers.",
+                    "All real numbers except 0.",
+                    "All positive real numbers.",
+                    "All integers."
+                ],
+                correct: 1,
+                explanation: "The function $f(x) = 1/x$ is not defined when the denominator is zero, so $x \\neq 0$. The domain is $(-\\infty, 0) \\cup (0, \\infty)$."
+            },
+            {
+                question: "If a function is defined on a set of real numbers and produces real numbers, what is it called?",
+                options: [
+                    "A complex function",
+                    "A discrete function",
+                    "A real function",
+                    "An integer function"
+                ],
+                correct: 2,
+                explanation: "A function where the domain and codomain are sets of real numbers is called a real function."
+            },
+            {
+                question: "In the stone-throwing example, $h(t) = 30t - 5t^2$, what does the domain $[0, 6]$ represent?",
+                options: [
+                    "The height the stone reaches.",
+                    "The time the stone is in the air.",
+                    "The initial speed of the stone.",
+                    "The total distance traveled."
+                ],
+                correct: 1,
+                explanation: "The domain represents the time from when the stone is thrown ($t=0$) until it hits the ground again ($t=6$)."
+            },
+            {
+                question: "In the stone-throwing example, $h(t) = 30t - 5t^2$, what is the range $[0, 45]$?",
+                options: [
+                    "The time the stone is in the air.",
+                    "The possible heights of the stone above the ground.",
+                    "The speed of the stone.",
+                    "The acceleration of the stone."
+                ],
+                correct: 1,
+                explanation: "The range represents the possible heights of the stone, from ground level (0m) to its maximum height (45m)."
+            },
+            {
+                question: "Which function is represented by a U-shaped graph opening upwards?",
+                options: [
+                    "$f(x) = x^3$",
+                    "$f(x) = 1/x$",
+                    "$f(x) = x^2$",
+                    "$f(x) = \\sqrt{x}$"
+                ],
+                correct: 2,
+                explanation: "The function $f(x) = x^2$ is a parabola, which has a characteristic U-shape."
+            },
+            {
+                question: "The graph of $f(x) = \\sin(x)$ is...",
+                options: [
+                    "A straight line.",
+                    "A parabola.",
+                    "A periodic wave.",
+                    "An exponential curve."
+                ],
+                correct: 2,
+                explanation: "The sine function produces a periodic, wave-like graph that oscillates between -1 and 1."
+            },
+            {
+                question: "What command is used in Octave/Matlab to create 2D plots?",
+                options: [
+                    "`graph()`",
+                    "`draw()`",
+                    "`plot()`",
+                    "`figure()`"
+                ],
+                correct: 2,
+                explanation: "The `plot()` command is the primary function used for creating 2D graphs in Octave and Matlab."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = [];
+        let showingResults = false;
+
+        function renderQuestion(index) {
+            const question = questions[index];
+            const container = document.getElementById('questions-container');
+            
+            container.innerHTML = `
+                <div class="question-container current">
+                    <div class="question-header">
+                        <span class="question-number">Question ${index + 1}</span>
+                        <span>${index + 1} / ${questions.length}</span>
+                    </div>
+                    <div class="question-text">${question.question}</div>
+                    <div class="options">
+                        ${question.options.map((option, i) => 
+                            `<div class="option" onclick="selectAnswer(${i})" data-option="${i}">
+                                ${option}
+                            </div>`
+                        ).join('')}
+                    </div>
+                    <div id="feedback" class="feedback hidden"></div>
+                </div>
+            `;
+            
+            // If user has already answered this question, show their selection
+            if (userAnswers[index] !== undefined) {
+                showAnswer(index);
+            }
+            
+            MathJax.typesetPromise();
+        }
+
+        function selectAnswer(optionIndex) {
+            if (showingResults) return;
+            
+            // Clear previous selections
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Mark selected option
+            document.querySelector(`[data-option="${optionIndex}"]`).classList.add('selected');
+            
+            // Store answer
+            userAnswers[currentQuestion] = optionIndex;
+            
+            // Show answer immediately
+            showAnswer(currentQuestion);
+            
+            updateScore();
+            updateProgress();
+        }
+
+        function showAnswer(questionIndex) {
+            const question = questions[questionIndex];
+            const userAnswer = userAnswers[questionIndex];
+            const isCorrect = userAnswer === question.correct;
+            
+            // Mark all options as correct/incorrect
+            document.querySelectorAll('.option').forEach((opt, i) => {
+                if (i === question.correct) {
+                    opt.classList.add('correct');
+                } else if (i === userAnswer && !isCorrect) {
+                    opt.classList.add('incorrect');
+                }
+                opt.style.pointerEvents = 'none';
+            });
+            
+            // Show feedback
+            const feedback = document.getElementById('feedback');
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.innerHTML = `
+                <strong>${isCorrect ? '✅ Correct!' : '❌ Incorrect!'}</strong><br>
+                ${question.explanation}
+            `;
+            feedback.classList.remove('hidden');
+            
+            MathJax.typesetPromise();
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion(currentQuestion);
+                updateButtons();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion(currentQuestion);
+                updateButtons();
+            }
+        }
+
+        function updateButtons() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            prevBtn.disabled = currentQuestion === 0;
+            
+            if (currentQuestion === questions.length - 1) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            }
+        }
+
+        function updateScore() {
+            score = userAnswers.filter((answer, index) => 
+                answer === questions[index].correct
+            ).length;
+            
+            document.getElementById('score-display').textContent = `Score: ${score}/${questions.length}`;
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+
+        function submitQuiz() {
+            showingResults = true;
+            updateScore();
+            
+            const quizContainer = document.getElementById('quiz-container');
+            const resultsContainer = document.getElementById('results-container');
+            
+            quizContainer.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+            
+            const finalScore = document.getElementById('final-score');
+            const scoreMessage = document.getElementById('score-message');
+            const percentage = Math.round((score / questions.length) * 100);
+            
+            finalScore.textContent = `${score}/${questions.length} (${percentage}%)`;
+            
+            if (percentage >= 90) {
+                finalScore.className = 'final-score score-excellent';
+                scoreMessage.textContent = '🎉 Excellent! You have mastered these function concepts!';
+            } else if (percentage >= 70) {
+                finalScore.className = 'final-score score-good';
+                scoreMessage.textContent = '👍 Good job! You have a solid understanding of the concepts.';
+            } else {
+                finalScore.className = 'final-score score-poor';
+                scoreMessage.textContent = '📚 Keep studying! Review the concepts and try again.';
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = [];
+            showingResults = false;
+            
+            document.getElementById('quiz-container').classList.remove('hidden');
+            document.getElementById('results-container').classList.add('hidden');
+            
+            renderQuestion(0);
+            updateButtons();
+            updateScore();
+            updateProgress();
+        }
+
+        // Initialize quiz
+        document.addEventListener('DOMContentLoaded', function() {
+            renderQuestion(0);
+            updateButtons();
+            updateProgress();
+        });
+    </script>
+</body>
+</html>
