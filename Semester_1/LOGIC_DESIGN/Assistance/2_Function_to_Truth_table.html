@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Truth Table Generator (1–10 variables)</title>
+<style>
+  :root{
+    --bg1:#0b1021; --bg2:#1a0a2e; --panel:#0f172a; --ink:#e6f1ff; --muted:#94a3b8;
+    --pri1:#22d3ee; --pri2:#a78bfa; --pri3:#f97316; --good:#34d399; --bad:#f87171; --grid:#1f2a44;
+  }
+  body{margin:0;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--ink);
+        font-family:Inter,system-ui,Segoe UI,Roboto,Ubuntu,Cantarell,Arial,sans-serif;}
+  .wrap{max-width:1200px;margin:0 auto;padding:28px;}
+  h1{margin:0 0 8px;font-size:2.2rem;font-weight:800;
+     background:linear-gradient(135deg,var(--pri3),var(--pri1) 50%,var(--pri2));
+     -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+  .sub{color:var(--muted);margin:0 0 20px;}
+  .grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:20px;align-items:start;}
+  .card{background:linear-gradient(145deg,rgba(15,23,42,0.9),rgba(15,23,42,0.6));
+        border:1px solid rgba(167,139,250,0.25);border-radius:14px;padding:16px;backdrop-filter:blur(8px);
+        box-shadow:0 8px 32px rgba(167,139,250,0.15);}
+  label{display:block;margin:8px 0;color:var(--muted);font-weight:600;}
+  textarea{width:100%;min-height:92px;border-radius:10px;border:1px solid #26334e;background:#0b1324;
+           color:var(--ink);padding:10px 12px;font-family:ui-monospace,Consolas,Menlo,monospace;}
+  input[type="text"]{width:100%;border-radius:10px;border:1px solid #26334e;background:#0b1324;
+           color:var(--ink);padding:10px 12px;font-family:ui-monospace,Consolas,Menlo,monospace;}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:10px;}
+  .btn{background:linear-gradient(135deg,var(--pri3),#fbbf24);color:#1b0b11;border:none;border-radius:10px;
+       padding:10px 14px;font-weight:800;cursor:pointer;box-shadow:0 6px 18px rgba(249,115,22,0.4);}
+  .btn.alt{background:linear-gradient(135deg,#7c3aed,#a78bfa);color:white;box-shadow:0 6px 18px rgba(124,58,237,0.4);}
+  .btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .hint{color:var(--muted);font-size:0.9rem;margin-top:6px;}
+  table{width:100%;border-collapse:collapse;margin-top:10px;border-radius:10px;overflow:hidden;}
+  th,td{padding:10px;text-align:center;border-bottom:1px solid var(--grid);}
+  thead th{position:sticky;top:0;background:linear-gradient(135deg,#0d162b,#121a33);color:#c7d2fe;font-weight:800;}
+  tbody tr:nth-child(odd){background:rgba(34,211,238,0.03);}
+  td.val1{color:#06281c;background:rgba(52,211,153,0.25);font-weight:700;}
+  td.val0{color:#310a0a;background:rgba(248,113,113,0.22);font-weight:700;}
+  .badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid rgba(34,211,238,0.35);
+         background:linear-gradient(135deg,rgba(34,211,238,0.1),rgba(167,139,250,0.08));}
+  .caps{font-family:ui-monospace,Consolas,monospace;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;}
+  .warn{color:#fde68a;}
+  .ok{color:var(--good);}
+  .err{color:#fecaca;}
+  .footer{margin-top:8px;color:var(--muted);font-size:0.9rem;}
+  @media (max-width:1000px){.grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Truth Table Generator (1–10 variables)</h1>
+    <p class="sub">Enter a Boolean function; auto‑detect variables or specify order, then generate a full truth table with CSV export.</p>
+
+    <div class="grid">
+      <div class="card">
+        <label>Boolean function (infix, supports +, adjacency/·/* for AND, postfix ' or ’ for NOT, parentheses)</label>
+        <textarea id="expr" spellcheck="false">g(a, b , c, d) = (cd + b’c + bd’)(b + d)</textarea>
+        <div class="grid2">
+          <div>
+            <label>Variable order (optional, comma‑separated; leave empty for auto‑detect A..Z)</label>
+            <input id="vars" type="text" placeholder="e.g., a,b,c,d" />
+            <div class="hint">Detected variables are sorted alphabetically if left empty.</div>
+          </div>
+          <div>
+            <label>Options</label>
+            <div class="row">
+              <label><input type="checkbox" id="showSigma" checked /> Show Σ (minterm indices)</label>
+              <label><input type="checkbox" id="showPi" checked /> Show Π (maxterm indices)</label>
+            </div>
+            <div class="hint">Indices use the leftmost variable as MSB when computing binary row numbers.</div>
+          </div>
+        </div>
+        <div class="row">
+          <button class="btn" id="gen">Generate Truth Table</button>
+          <button class="btn alt" id="csv" disabled>Download CSV</button>
+          <span id="status" class="badge">Ready</span>
+        </div>
+        <div id="note" class="footer"></div>
+      </div>
+
+      <div class="card">
+        <div id="meta" class="footer"></div>
+        <div id="indices" class="footer"></div>
+        <div id="tableWrap" style="max-height:60vh; overflow:auto;"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const exprEl = document.getElementById('expr');
+  const varsEl = document.getElementById('vars');
+  const genBtn = document.getElementById('gen');
+  const csvBtn = document.getElementById('csv');
+  const tableWrap = document.getElementById('tableWrap');
+  const statusEl = document.getElementById('status');
+  const metaEl = document.getElementById('meta');
+  const indicesEl = document.getElementById('indices');
+  const noteEl = document.getElementById('note');
+  const showSigma = document.getElementById('showSigma');
+  const showPi = document.getElementById('showPi');
+
+  // Normalize input expression: strip function name, normalize symbols
+  function normalizeInput(str){
+    str = String(str || '');
+    const eqAt = str.indexOf('=');
+    if (eqAt >= 0) str = str.slice(eqAt+1);
+    str = str.replace(/\u2019/g, "'");       // right single quote → apostrophe
+    str = str.replace(/[·•]/g, '*');         // middle dot → *
+    str = str.replace(/·/g, '*');
+    str = str.replace(/\s+/g, '');           // remove spaces
+    return str;
+  }
+
+  // Tokenization: variables (A-Z/a-z single letters), operators + * ' ( ), and implicit AND insertion
+  function tokenize(expr){
+    const tokens = [];
+    const isVar = c => /[A-Za-z]/.test(c);
+    for (let i=0;i<expr.length;i++){
+      const c = expr[i];
+      if (isVar(c)){
+        tokens.push({type:'VAR', val:c});
+      } else if (c === '+'){
+        tokens.push({type:'OR', val:'+'});
+      } else if (c === '*' || c === '.'){
+        tokens.push({type:'AND', val:'*'});
+      } else if (c === "'"){
+        tokens.push({type:'NOT', val:"'"});
+      } else if (c === '('){
+        tokens.push({type:'LP', val:'('});
+      } else if (c === ')'){
+        tokens.push({type:'RP', val:')'});
+      } else {
+        throw new Error('Unsupported character: ' + c);
+      }
+    }
+    // Insert implicit AND where needed: [VAR|RP|NOT] followed by [VAR|LP]
+    const out = [];
+    const leftCan = t => t && (t.type==='VAR' || t.type==='RP' || t.type==='NOT');
+    const rightCan = t => t && (t.type==='VAR' || t.type==='LP');
+    for (let i=0;i<tokens.length;i++){
+      const t = tokens[i];
+      out.push(t);
+      const n = tokens[i+1];
+      if (leftCan(t) && rightCan(n)){
+        // do not insert AND if left is NOT and previous isn't attachable
+        if (!(t.type==='NOT' && out.length>=2 && out[out.length-2].type!=='VAR' && out[out.length-2].type!=='RP')){
+          out.push({type:'AND', val:'*'});
+        }
+      }
+    }
+    return out;
+  }
+
+  // Shunting-yard to RPN; precedence: NOT (postfix) 3, AND 2, OR 1
+  function toRPN(tokens){
+    const prec = { 'NOT':3, 'AND':2, 'OR':1 };
+    const rightAssoc = { 'NOT':true }; // others left-assoc
+    const output = [];
+    const ops = [];
+    for (let i=0;i<tokens.length;i++){
+      const t = tokens[i];
+      if (t.type==='VAR'){
+        output.push(t);
+      } else if (t.type==='OR' || t.type==='AND' || t.type==='NOT'){
+        while (ops.length){
+          const top = ops[ops.length-1];
+          if (top.type==='LP') break;
+          const pTop = prec[top.type] || 0;
+          const pCur = prec[t.type] || 0;
+          if ((rightAssoc[t.type] ? (pTop > pCur) : (pTop >= pCur))){
+            output.push(ops.pop());
+          } else break;
+        }
+        ops.push(t);
+      } else if (t.type==='LP'){
+        ops.push(t);
+      } else if (t.type==='RP'){
+        while (ops.length && ops[ops.length-1].type!=='LP'){
+          output.push(ops.pop());
+        }
+        if (!ops.length) throw new Error('Mismatched parentheses');
+        ops.pop(); // discard LP
+        // Handle immediate postfix NOT(s) after a ')', e.g., (xy)''
+        while (tokens[i+1] && tokens[i+1].type==='NOT'){
+          // consume upcoming NOT by pushing to stack at highest precedence
+          ops.push(tokens[i+1]);
+          i++;
+        }
+      } else {
+        throw new Error('Unexpected token: ' + t.type);
+      }
+    }
+    while (ops.length){
+      const t = ops.pop();
+      if (t.type==='LP' || t.type==='RP') throw new Error('Mismatched parentheses');
+      output.push(t);
+    }
+    return output;
+  }
+
+  // Evaluate RPN for a given environment {a:0/1,...}
+  function evalRPN(rpn, env){
+    const st = [];
+    for (const t of rpn){
+      if (t.type==='VAR'){
+        const v = env[t.val];
+        if (v===undefined) throw new Error('Value missing for variable: ' + t.val);
+        st.push(Boolean(v));
+      } else if (t.type==='NOT'){
+        if (st.length<1) throw new Error('NOT missing operand');
+        st.push(!st.pop());
+      } else if (t.type==='AND'){
+        if (st.length<2) throw new Error('AND missing operand');
+        const b = st.pop(), a = st.pop();
+        st.push(a && b);
+      } else if (t.type==='OR'){
+        if (st.length<2) throw new Error('OR missing operand');
+        const b = st.pop(), a = st.pop();
+        st.push(a || b);
+      } else {
+        throw new Error('Unknown RPN token: ' + t.type);
+      }
+    }
+    if (st.length!==1) throw new Error('Malformed expression');
+    return st ? 1 : 0;
+  }
+
+  // Collect variable set from tokens
+  function detectVars(tokens){
+    const set = new Set();
+    tokens.forEach(t => { if (t.type==='VAR') set.add(t.val); });
+    return Array.from(set).sort((a,b)=>a.localeCompare(b));
+  }
+
+  // Produce all assignments (rows) for given variables
+  function* assignments(vars){
+    const n = vars.length;
+    const total = 1 << n;
+    for (let i=0;i<total;i++){
+      const env = {};
+      for (let j=0;j<n;j++){
+        const bit = (i >> (n-1-j)) & 1; // leftmost var is MSB
+        env[vars[j]] = bit;
+      }
+      yield { env, index:i };
+    }
+  }
+
+  function buildTable(vars, rows){
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const trh = document.createElement('tr');
+    vars.forEach(v => {
+      const th = document.createElement('th'); th.textContent = v; trh.appendChild(th);
+    });
+    const thf = document.createElement('th'); thf.textContent = 'F'; trh.appendChild(thf);
+    const thi = document.createElement('th'); thi.textContent = 'index'; trh.appendChild(thi);
+    thead.appendChild(trh); table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    for (const r of rows){
+      const tr = document.createElement('tr');
+      vars.forEach(v => {
+        const td = document.createElement('td');
+        td.textContent = r.env[v];
+        tr.appendChild(td);
+      });
+      const tdF = document.createElement('td');
+      tdF.textContent = r.val;
+      tdF.className = r.val ? 'val1' : 'val0';
+      tr.appendChild(tdF);
+
+      const tdI = document.createElement('td');
+      tdI.textContent = r.index;
+      tr.appendChild(tdI);
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    return table;
+  }
+
+  function toCSV(vars, rows){
+    const head = [...vars, 'F', 'index'].join(',');
+    const lines = rows.map(r => {
+      const vals = vars.map(v => r.env[v]);
+      return [...vals, r.val, r.index].join(',');
+    });
+    return [head, ...lines].join('\n');
+  }
+
+  function computeIndices(rows){
+    const ones = [], zeros = [];
+    rows.forEach(r => (r.val ? ones : zeros).push(r.index));
+    return { ones, zeros };
+  }
+
+  genBtn.addEventListener('click', ()=>{
+    statusEl.textContent = 'Parsing…';
+    tableWrap.innerHTML = '';
+    metaEl.textContent = '';
+    indicesEl.textContent = '';
+    noteEl.textContent = '';
+    csvBtn.disabled = true;
+
+    try{
+      const raw = exprEl.value;
+      const norm = normalizeInput(raw);
+      if (!norm) throw new Error('Empty expression');
+
+      // Tokenize → RPN
+      const tokens = tokenize(norm);
+      const rpn = toRPN(tokens);
+
+      // Variables: from user or auto-detect
+      let vars = varsEl.value.trim();
+      let varList;
+      if (vars){
+        varList = vars.split(',').map(s=>s.trim()).filter(Boolean);
+      } else {
+        varList = detectVars(tokens);
+      }
+      if (varList.length < 1) throw new Error('No variables found (need 1–10)');
+      if (varList.length > 10) throw new Error('Too many variables (maximum 10)');
+      // Validate variables exist in tokens
+      const tokenVars = new Set(detectVars(tokens));
+      varList.forEach(v=>{
+        if (!/^[A-Za-z]$/.test(v)) throw new Error('Variable names must be single letters A–Z: ' + v);
+        if (!tokenVars.has(v)) console.warn('Variable not used in expression:', v);
+      });
+
+      // Evaluate all rows
+      const rows = [];
+      let ones = 0;
+      for (const it of assignments(varList)){
+        const val = evalRPN(rpn, it.env);
+        rows.push({ env: it.env, index: it.index, val });
+        if (val) ones++;
+      }
+
+      // Render table
+      const table = buildTable(varList, rows);
+      tableWrap.appendChild(table);
+
+      // Meta and indices
+      const total = rows.length;
+      metaEl.innerHTML = `
+        <div class="badge">Variables: <span class="caps">${varList.join(', ')}</span></div>
+        <div class="badge">Rows: ${total} (2^${varList.length})</div>
+        <div class="badge ok">Ones: ${ones}</div>
+        <div class="badge warn">Zeros: ${total-ones}</div>
+      `;
+      const {ones: idx1, zeros: idx0} = computeIndices(rows);
+      let idxHTML = '';
+      if (showSigma.checked) idxHTML += `<div class="badge">Σ (minterms): (${idx1.join(', ')})</div> `;
+      if (showPi.checked) idxHTML += `<div class="badge">Π (maxterms): (${idx0.join(', ')})</div>`;
+      indicesEl.innerHTML = idxHTML;
+
+      // CSV download
+      const csv = toCSV(varList, rows);
+      const blob = new Blob([csv], {type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      csvBtn.onclick = ()=>{
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'truth_table.csv';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      };
+      csvBtn.disabled = false;
+
+      // Note for large tables
+      if (total > 512){
+        noteEl.innerHTML = 'Rendering 1024 rows may be slow on some devices; use CSV for external analysis if needed.';
+      }
+
+      statusEl.textContent = 'Done';
+    } catch (err){
+      statusEl.textContent = 'Error';
+      indicesEl.textContent = '';
+      tableWrap.innerHTML = `<div class="err">${err.message}</div>`;
+    }
+  });
+})();
+</script>
+</body>
+</html>
