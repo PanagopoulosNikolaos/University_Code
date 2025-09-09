@@ -1,12 +1,14 @@
 {
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "chrome", // Use "chrome" for Chromium-based browsers like Brave
+            "type": "chrome",
             "request": "launch",
-            "name": "Open 01_LGDS.html in Brave",
-            "file": "/home/ice/Documents/University_Code/Semester_1/LOGIC_DESIGN/QuizGames/01_LGDS.html",
-            "runtimeExecutable": "/usr/bin/brave-browser" // Path to Brave executable
+            "name": "Open 11_QuizGame.html",
+            "file": "/home/ice/Documents/University_Code/Semester_1/MATHEMATICAL ANALYSIS/Quizzes/11_QuizGame.html"
         }
     ]
 }
