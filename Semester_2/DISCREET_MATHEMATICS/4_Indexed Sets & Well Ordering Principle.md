@@ -21,11 +21,11 @@ graph TD
     i3 --> A3[A₃]
     dots --> An[Aₙ]
     
-    style I fill:#e3f2fd
-    style A1 fill:#fff3e0
-    style A2 fill:#fff3e0
-    style A3 fill:#fff3e0
-    style An fill:#fff3e0
+    style I fill:#f
+    style A1 fill:#f
+    style A2 fill:#f
+    style A3 fill:#f
+    style An fill:#f
 ```
 
 ### **Operations on Indexed Sets**
@@ -51,9 +51,9 @@ graph LR
     Z["Integers"] --> NWO["Not Well-Ordered"]
     Q["Positive Rationals"] --> NWO2["Not Well-Ordered"]
     
-    style WO fill:#c8e6c9
-    style NWO fill:#ffcdd2
-    style NWO2 fill:#ffcdd2
+    style WO fill:#f
+    style NWO fill:#f
+    style NWO2 fill:#f
 
 ```
 
