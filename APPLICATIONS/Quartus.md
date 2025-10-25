@@ -1,6 +1,6 @@
 # Installing Intel Quartus Prime Lite 20.1 on Linux
 
-Version **20.1** is the most stable Quartus release for Linux systems (at least in my opinion). 
+Version **20.1** is the most stable Quartus release for Linux systems (at least in my opinion).
 
 ***
 
@@ -83,9 +83,54 @@ sudo reboot
 
 ## Advanced Configuration
 
-### Only for Non-20.1 Versions or ModelSim not installed edge cases
+### Only for Non-20.1 Versions or ModelSim Edge Cases
 
 These fixes address compatibility issues.
+
+#### ModelSim vco Script Fix
+
+The vco script searches for incorrect directories on Debian systems. Apply this fix if ModelSim fails to launch:
+
+```bash
+chmod u+w ~/intelFPGA_lite/20.1/modelsim_ase/vco
+nano ~/intelFPGA_lite/20.1/modelsim_ase/vco
+```
+
+**Change line 13 from:**
+```
+mode=${MTI_VCO_MODE:-""}
+```
+
+**to:**
+```
+mode=${MTI_VCO_MODE:-"32"}
+```
+
+**Change line 211 from:**
+```
+*) vco="linux_rh60" ;;
+```
+
+**to:**
+```
+*) vco="linux" ;;
+```
+
+#### Permission Fix for ModelSim
+
+The tcl.fs cache file requires read permissions :
+
+```bash
+chmod -R +r ~/intelFPGA_lite/20.1/modelsim_ase/
+```
+
+#### EDA Tool Path Configuration
+
+Set ModelSim path in Quartus if automatic detection fails :
+
+Navigate to: **Tools → Options → EDA Tool Options**
+
+Set path to: `~/intelFPGA_lite/20.1/modelsim_ase/bin`
 
 #### libncurses5 Symlink
 
@@ -101,7 +146,7 @@ Compile from source or obtain a usr-merge compatible package.
 
 #### Freetype 2.4.12 for ModelSim
 
-ModelSim requires this specific version :
+Only needed if encountering `libfreetype.so.6: cannot open shared object file` errors :
 
 ```bash
 wget https://sourceforge.net/projects/freetype/files/freetype2/2.4.12/freetype-2.4.12.tar.bz2
