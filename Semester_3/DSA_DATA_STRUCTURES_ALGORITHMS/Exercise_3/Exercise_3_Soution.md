@@ -78,6 +78,11 @@ public:
         root = new TreeNode(root_value);
     }
     
+    ~BinaryTree() {
+        destroy(root);
+        root = nullptr;
+    }
+    
     // Υπολογίζει το ύψος του δέντρου
     int height(TreeNode* node) {
         if (node == nullptr) return -1;
@@ -97,6 +102,14 @@ public:
         if (node == nullptr) return 0;
         if (node->left == nullptr && node->right == nullptr) return 1;
         return countLeaves(node->left) + countLeaves(node->right);
+    }
+    
+private:
+    void destroy(TreeNode* node) {
+        if (node == nullptr) return;
+        destroy(node->left);
+        destroy(node->right);
+        delete node;
     }
 };
 
@@ -239,8 +252,20 @@ private:
         }
     }
 
+    void destroy(BSTNode* node) {
+        if (node == nullptr) return;
+        destroy(node->left);
+        destroy(node->right);
+        delete node;
+    }
+
 public:
     BST() : root(nullptr) {}
+    
+    ~BST() {
+        destroy(root);
+        root = nullptr;
+    }
     
     // Εισαγωγή νέας τιμής στο BST
     void insert(int value) {
@@ -410,6 +435,13 @@ void printVector(const vector<int>& vec) {
     cout << endl;
 }
 
+void freeTree(TreeNode* node) {
+    if (!node) return;
+    freeTree(node->left);
+    freeTree(node->right);
+    delete node;
+}
+
 int main() {
     // Δημιουργία BST
     TreeNode* root = new TreeNode(50);
@@ -437,6 +469,8 @@ int main() {
     traversal.postorder(root, result);
     cout << "Post-order: ";
     printVector(result);
+    
+    freeTree(root);
     
     return 0;
 }
@@ -543,6 +577,13 @@ bool isBalanced(TreeNode* node) {
     return false;
 }
 
+void freeTree(TreeNode* node) {
+    if (node == nullptr) return;
+    freeTree(node->left);
+    freeTree(node->right);
+    delete node;
+}
+
 int main() {
     // Παράδειγμα 1: Ισορροπημένο δέντρο
     TreeNode* balancedRoot = new TreeNode(10);
@@ -561,6 +602,9 @@ int main() {
     cout << "Ύψος ισορροπημένου: " << height(balancedRoot) << endl;
     cout << "\nΜη ισορροπημένο δέντρο: " << (isBalanced(unbalancedRoot) ? "Ναι" : "Όχι") << endl;
     cout << "Ύψος μη ισορροπημένου: " << height(unbalancedRoot) << endl;
+    
+    freeTree(balancedRoot);
+    freeTree(unbalancedRoot);
     
     return 0;
 }
@@ -838,6 +882,13 @@ public:
     }
 };
 
+void freeTree(AVLNode* node) {
+    if (!node) return;
+    freeTree(node->left);
+    freeTree(node->right);
+    delete node;
+}
+
 int main() {
     AVLTree avl;
     AVLNode* root = nullptr;
@@ -858,6 +909,9 @@ int main() {
         cout << "  Ύψος: " << avl.height(root) << endl;
         cout << "  Balance Factor ρίζας: " << avl.balanceFactor(root) << endl;
     }
+    
+    freeTree(root);
+    root = nullptr;
     
     return 0;
 }
