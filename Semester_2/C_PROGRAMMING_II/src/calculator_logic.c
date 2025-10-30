@@ -130,6 +130,10 @@ void calculator_evaluate(Calculator* calc, const char* expression) {
     }
 
     while (operators.top != -1) {
+        if (os_peek(&operators) == '(') {
+            strcpy(calc->buffer, "Error: Mismatched parentheses");
+            return;
+        }
         apply_operator(&numbers, os_pop(&operators), calc->angle_mode);
     }
 
