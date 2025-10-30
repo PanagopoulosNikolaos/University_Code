@@ -1,6 +1,3 @@
-Of course, here is a test created based on the content of the provided PDFs, with theory questions and exercises similar in nature to the examples.
-
----
 
 ### **Test: Principles of Electromagnetism and Telecommunications**
 

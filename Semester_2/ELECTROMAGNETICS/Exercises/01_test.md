@@ -1,5 +1,3 @@
-Of course, here is a test based on the provided documents, with a section for theory and a section for exercises.
-
 ### **Theory Questions**
 
 **Instructions:** Answer the following questions based on your understanding of the course material.

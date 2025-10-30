@@ -1,7 +1,3 @@
-Here is a test created based on the content of the provided PDFs, with theory questions and exercises covering a wide range of topics.
-
-***
-
 ### **Principles of Electromagnetism & Telecommunications Exam**
 
 ---
