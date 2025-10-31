@@ -23,7 +23,7 @@ class BinaryTree:
         self.root = TreeNode(root_value)
     
     def height(self, node):
-        """Υπολογίζει το ύψος του δέντρου"""
+        """Calculates the height of the tree"""
         if node is None:
             return -1
         left_height = self.height(node.left)
@@ -31,29 +31,29 @@ class BinaryTree:
         return max(left_height, right_height) + 1
     
     def count_nodes(self, node):
-        """Μετράει συνολικούς κόμβους"""
+        """Counts total nodes"""
         if node is None:
             return 0
         return 1 + self.count_nodes(node.left) + self.count_nodes(node.right)
     
     def count_leaves(self, node):
-        """Μετράει φύλλα (κόμβους χωρίς παιδιά)"""
+        """Counts leaves (nodes without children)"""
         if node is None:
             return 0
         if node.left is None and node.right is None:
             return 1
         return self.count_leaves(node.left) + self.count_leaves(node.right)
 
-# Παράδειγμα χρήσης
+# Example usage
 tree = BinaryTree(1)
 tree.root.left = TreeNode(2)
 tree.root.right = TreeNode(3)
 tree.root.left.left = TreeNode(4)
 tree.root.left.right = TreeNode(5)
 
-print("Ύψος δέντρου:", tree.height(tree.root))
-print("Συνολικοί κόμβοι:", tree.count_nodes(tree.root))
-print("Αριθμός φύλλων:", tree.count_leaves(tree.root))
+print("Tree height:", tree.height(tree.root))
+print("Total nodes:", tree.count_nodes(tree.root))
+print("Number of leaves:", tree.count_leaves(tree.root))
 ```
 
 ### C++
@@ -83,7 +83,7 @@ public:
         root = nullptr;
     }
     
-    // Υπολογίζει το ύψος του δέντρου
+    // Calculates the height of the tree
     int height(TreeNode* node) {
         if (node == nullptr) return -1;
         int left_height = height(node->left);
@@ -91,13 +91,13 @@ public:
         return max(left_height, right_height) + 1;
     }
     
-    // Μετράει συνολικούς κόμβους
+    // Counts total nodes
     int countNodes(TreeNode* node) {
         if (node == nullptr) return 0;
         return 1 + countNodes(node->left) + countNodes(node->right);
     }
     
-    // Μετράει φύλλα
+    // Counts leaves
     int countLeaves(TreeNode* node) {
         if (node == nullptr) return 0;
         if (node->left == nullptr && node->right == nullptr) return 1;
@@ -120,9 +120,9 @@ int main() {
     tree.root->left->left = new TreeNode(4);
     tree.root->left->right = new TreeNode(5);
     
-    cout << "Ύψος δέντρου: " << tree.height(tree.root) << endl;
-    cout << "Συνολικοί κόμβοι: " << tree.countNodes(tree.root) << endl;
-    cout << "Αριθμός φύλλων: " << tree.countLeaves(tree.root) << endl;
+    cout << "Tree height: " << tree.height(tree.root) << endl;
+    cout << "Total nodes: " << tree.countNodes(tree.root) << endl;
+    cout << "Number of leaves: " << tree.countLeaves(tree.root) << endl;
     
     return 0;
 }
@@ -153,7 +153,7 @@ class BST:
         self.root = None
     
     def insert(self, value):
-        """Εισαγωγή νέας τιμής στο BST"""
+        """Insert new value into BST"""
         if self.root is None:
             self.root = BSTNode(value)
         else:
@@ -172,7 +172,7 @@ class BST:
                 self._insert_recursive(node.right, value)
     
     def search(self, value):
-        """Αναζήτηση τιμής στο BST - O(log n) για ισορροπημένο δέντρο"""
+        """Search for value in BST - O(log n) for balanced tree"""
         return self._search_recursive(self.root, value)
     
     def _search_recursive(self, node, value):
@@ -186,7 +186,7 @@ class BST:
             return self._search_recursive(node.right, value)
     
     def find_min(self, node=None):
-        """Βρίσκει την ελάχιστη τιμή (αριστερότερος κόμβος)"""
+        """Finds the minimum value (leftmost node)"""
         if node is None:
             node = self.root
         while node.left is not None:
@@ -194,23 +194,23 @@ class BST:
         return node.value
     
     def find_max(self, node=None):
-        """Βρίσκει τη μέγιστη τιμή (δεξιότερος κόμβος)"""
+        """Finds the maximum value (rightmost node)"""
         if node is None:
             node = self.root
         while node.right is not None:
             node = node.right
         return node.value
 
-# Παράδειγμα χρήσης
+# Example usage
 bst = BST()
 values = [50, 30, 70, 20, 40, 60, 80]
 for val in values:
     bst.insert(val)
 
-print("Αναζήτηση 40:", bst.search(40))
-print("Αναζήτηση 100:", bst.search(100))
-print("Ελάχιστη τιμή:", bst.find_min())
-print("Μέγιστη τιμή:", bst.find_max())
+print("Search 40:", bst.search(40))
+print("Search 100:", bst.search(100))
+print("Minimum value:", bst.find_min())
+print("Maximum value:", bst.find_max())
 ```
 
 ### C++
@@ -267,17 +267,17 @@ public:
         root = nullptr;
     }
     
-    // Εισαγωγή νέας τιμής στο BST
+    // Insert new value into BST
     void insert(int value) {
         root = insertRecursive(root, value);
     }
     
-    // Αναζήτηση τιμής - O(log n) για ισορροπημένο δέντρο
+    // Search for value - O(log n) for balanced tree
     bool search(int value) {
         return searchRecursive(root, value);
     }
     
-    // Βρίσκει την ελάχιστη τιμή
+    // Finds the minimum value
     int findMin() {
         BSTNode* current = root;
         while (current->left != nullptr) {
@@ -286,7 +286,7 @@ public:
         return current->value;
     }
     
-    // Βρίσκει τη μέγιστη τιμή
+    // Finds the maximum value
     int findMax() {
         BSTNode* current = root;
         while (current->right != nullptr) {
@@ -304,10 +304,10 @@ int main() {
         bst.insert(val);
     }
     
-    cout << "Αναζήτηση 40: " << (bst.search(40) ? "Βρέθηκε" : "Δεν βρέθηκε") << endl;
-    cout << "Αναζήτηση 100: " << (bst.search(100) ? "Βρέθηκε" : "Δεν βρέθηκε") << endl;
-    cout << "Ελάχιστη τιμή: " << bst.findMin() << endl;
-    cout << "Μέγιστη τιμή: " << bst.findMax() << endl;
+    cout << "Search 40: " << (bst.search(40) ? "Found" : "Not found") << endl;
+    cout << "Search 100: " << (bst.search(100) ? "Found" : "Not found") << endl;
+    cout << "Minimum value: " << bst.findMin() << endl;
+    cout << "Maximum value: " << bst.findMax() << endl;
     
     return 0;
 }
@@ -340,36 +340,36 @@ class TreeNode:
 
 class TreeTraversal:
     def preorder(self, node, result=None):
-        """Pre-order: Ρίζα → Αριστερά → Δεξιά"""
+        """Pre-order: Root → Left → Right"""
         if result is None:
             result = []
         if node:
-            result.append(node.value)  # Επίσκεψη ρίζας
+            result.append(node.value)  # Visit root
             self.preorder(node.left, result)
             self.preorder(node.right, result)
         return result
     
     def inorder(self, node, result=None):
-        """In-order: Αριστερά → Ρίζα → Δεξιά (ταξινομημένη για BST)"""
+        """In-order: Left → Root → Right (sorted for BST)"""
         if result is None:
             result = []
         if node:
             self.inorder(node.left, result)
-            result.append(node.value)  # Επίσκεψη ρίζας
+            result.append(node.value)  # Visit root
             self.inorder(node.right, result)
         return result
     
     def postorder(self, node, result=None):
-        """Post-order: Αριστερά → Δεξιά → Ρίζα"""
+        """Post-order: Left → Right → Root"""
         if result is None:
             result = []
         if node:
             self.postorder(node.left, result)
             self.postorder(node.right, result)
-            result.append(node.value)  # Επίσκεψη ρίζας
+            result.append(node.value)  # Visit root
         return result
 
-# Δημιουργία BST
+# Create BST
 root = TreeNode(50)
 root.left = TreeNode(30)
 root.right = TreeNode(70)
@@ -380,7 +380,7 @@ root.right.right = TreeNode(80)
 
 traversal = TreeTraversal()
 print("Pre-order:", traversal.preorder(root))
-print("In-order (ταξινομημένη):", traversal.inorder(root))
+print("In-order (sorted):", traversal.inorder(root))
 print("Post-order:", traversal.postorder(root))
 ```
 
@@ -400,30 +400,30 @@ struct TreeNode {
 
 class TreeTraversal {
 public:
-    // Pre-order: Ρίζα → Αριστερά → Δεξιά
+    // Pre-order: Root → Left → Right
     void preorder(TreeNode* node, vector<int>& result) {
         if (node) {
-            result.push_back(node->value);  // Επίσκεψη ρίζας
+            result.push_back(node->value);  // Visit root
             preorder(node->left, result);
             preorder(node->right, result);
         }
     }
     
-    // In-order: Αριστερά → Ρίζα → Δεξιά (ταξινομημένη για BST)
+    // In-order: Left → Root → Right (sorted for BST)
     void inorder(TreeNode* node, vector<int>& result) {
         if (node) {
             inorder(node->left, result);
-            result.push_back(node->value);  // Επίσκεψη ρίζας
+            result.push_back(node->value);  // Visit root
             inorder(node->right, result);
         }
     }
     
-    // Post-order: Αριστερά → Δεξιά → Ρίζα
+    // Post-order: Left → Right → Root
     void postorder(TreeNode* node, vector<int>& result) {
         if (node) {
             postorder(node->left, result);
             postorder(node->right, result);
-            result.push_back(node->value);  // Επίσκεψη ρίζας
+            result.push_back(node->value);  // Visit root
         }
     }
 };
@@ -443,7 +443,7 @@ void freeTree(TreeNode* node) {
 }
 
 int main() {
-    // Δημιουργία BST
+    // Create BST
     TreeNode* root = new TreeNode(50);
     root->left = new TreeNode(30);
     root->right = new TreeNode(70);
@@ -462,7 +462,7 @@ int main() {
     
     result.clear();
     traversal.inorder(root, result);
-    cout << "In-order (ταξινομημένη): ";
+    cout << "In-order (sorted): ";
     printVector(result);
     
     result.clear();
@@ -501,20 +501,20 @@ class TreeNode:
         self.right = None
 
 def height(node):
-    """Υπολογίζει το ύψος του κόμβου"""
+    """Calculates the height of the node"""
     if node is None:
         return -1
     return 1 + max(height(node.left), height(node.right))
 
 def is_balanced(node):
-    """Ελέγχει αν το δέντρο είναι ισορροπημένο"""
+    """Checks if the tree is balanced"""
     if node is None:
         return True
     
     left_height = height(node.left)
     right_height = height(node.right)
     
-    # Έλεγχος διαφοράς ύψους και αναδρομικός έλεγχος υποδέντρων
+    # Check height difference and recursive check of subtrees
     if (abs(left_height - right_height) <= 1 and 
         is_balanced(node.left) and 
         is_balanced(node.right)):
@@ -522,23 +522,23 @@ def is_balanced(node):
     
     return False
 
-# Παράδειγμα 1: Ισορροπημένο δέντρο
+# Example 1: Balanced tree
 balanced_root = TreeNode(10)
 balanced_root.left = TreeNode(5)
 balanced_root.right = TreeNode(15)
 balanced_root.left.left = TreeNode(3)
 balanced_root.left.right = TreeNode(7)
 
-# Παράδειγμα 2: Μη ισορροπημένο δέντρο (γραμμική αλυσίδα)
+# Example 2: Unbalanced tree (linear chain)
 unbalanced_root = TreeNode(1)
 unbalanced_root.right = TreeNode(2)
 unbalanced_root.right.right = TreeNode(3)
 unbalanced_root.right.right.right = TreeNode(4)
 
-print("Ισορροπημένο δέντρο:", is_balanced(balanced_root))
-print("Ύψος ισορροπημένου:", height(balanced_root))
-print("\nΜη ισορροπημένο δέντρο:", is_balanced(unbalanced_root))
-print("Ύψος μη ισορροπημένου:", height(unbalanced_root))
+print("Balanced tree:", is_balanced(balanced_root))
+print("Height of balanced:", height(balanced_root))
+print("\nUnbalanced tree:", is_balanced(unbalanced_root))
+print("Height of unbalanced:", height(unbalanced_root))
 ```
 
 ### C++
@@ -567,7 +567,7 @@ bool isBalanced(TreeNode* node) {
     int leftHeight = height(node->left);
     int rightHeight = height(node->right);
     
-    // Έλεγχος διαφοράς ύψους και αναδρομικός έλεγχος υποδέντρων
+    // Check height difference and recursive check of subtrees
     if (abs(leftHeight - rightHeight) <= 1 && 
         isBalanced(node->left) && 
         isBalanced(node->right)) {
@@ -585,23 +585,23 @@ void freeTree(TreeNode* node) {
 }
 
 int main() {
-    // Παράδειγμα 1: Ισορροπημένο δέντρο
+    // Example 1: Balanced tree
     TreeNode* balancedRoot = new TreeNode(10);
     balancedRoot->left = new TreeNode(5);
     balancedRoot->right = new TreeNode(15);
     balancedRoot->left->left = new TreeNode(3);
     balancedRoot->left->right = new TreeNode(7);
     
-    // Παράδειγμα 2: Μη ισορροπημένο δέντρο
+    // Example 2: Unbalanced tree
     TreeNode* unbalancedRoot = new TreeNode(1);
     unbalancedRoot->right = new TreeNode(2);
     unbalancedRoot->right->right = new TreeNode(3);
     unbalancedRoot->right->right->right = new TreeNode(4);
     
-    cout << "Ισορροπημένο δέντρο: " << (isBalanced(balancedRoot) ? "Ναι" : "Όχι") << endl;
-    cout << "Ύψος ισορροπημένου: " << height(balancedRoot) << endl;
-    cout << "\nΜη ισορροπημένο δέντρο: " << (isBalanced(unbalancedRoot) ? "Ναι" : "Όχι") << endl;
-    cout << "Ύψος μη ισορροπημένου: " << height(unbalancedRoot) << endl;
+    cout << "Balanced tree: " << (isBalanced(balancedRoot) ? "Yes" : "No") << endl;
+    cout << "Height of balanced: " << height(balancedRoot) << endl;
+    cout << "\nUnbalanced tree: " << (isBalanced(unbalancedRoot) ? "Yes" : "No") << endl;
+    cout << "Height of unbalanced: " << height(unbalancedRoot) << endl;
     
     freeTree(balancedRoot);
     freeTree(unbalancedRoot);
@@ -648,54 +648,54 @@ class AVLNode:
 
 class AVLTree:
     def get_height(self, node):
-        """Επιστρέφει το ύψος του κόμβου"""
+        """Returns the height of the node"""
         return node.height if node else -1
     
     def get_balance_factor(self, node):
-        """Υπολογίζει τον συντελεστή ισορροπίας"""
+        """Calculates the balance factor"""
         if not node:
             return 0
         return self.get_height(node.left) - self.get_height(node.right)
     
     def update_height(self, node):
-        """Ενημερώνει το ύψος του κόμβου"""
+        """Updates the height of the node"""
         if node:
             node.height = 1 + max(self.get_height(node.left), 
                                   self.get_height(node.right))
     
     def rotate_right(self, y):
-        """LL Rotation - Δεξιά Περιστροφή"""
+        """LL Rotation - Right Rotation"""
         x = y.left
         T2 = x.right
         
-        # Εκτέλεση περιστροφής
+        # Perform rotation
         x.right = y
         y.left = T2
         
-        # Ενημέρωση ύψους
+        # Update height
         self.update_height(y)
         self.update_height(x)
         
         return x
     
     def rotate_left(self, x):
-        """RR Rotation - Αριστερή Περιστροφή"""
+        """RR Rotation - Left Rotation"""
         y = x.right
         T2 = y.left
         
-        # Εκτέλεση περιστροφής
+        # Perform rotation
         y.left = x
         x.right = T2
         
-        # Ενημέρωση ύψους
+        # Update height
         self.update_height(x)
         self.update_height(y)
         
         return y
     
     def insert(self, node, value):
-        """Εισαγωγή με αυτόματη εξισορρόπηση"""
-        # Βήμα 1: Κανονική BST εισαγωγή
+        """Insertion with automatic balancing"""
+        # Step 1: Normal BST insertion
         if not node:
             return AVLNode(value)
         
@@ -704,13 +704,13 @@ class AVLTree:
         else:
             node.right = self.insert(node.right, value)
         
-        # Βήμα 2: Ενημέρωση ύψους
+        # Step 2: Update height
         self.update_height(node)
         
-        # Βήμα 3: Έλεγχος balance factor
+        # Step 3: Check balance factor
         balance = self.get_balance_factor(node)
         
-        # Βήμα 4: Εφαρμογή περιστροφών αν χρειάζεται
+        # Step 4: Apply rotations if needed
         
         # LL Case
         if balance > 1 and value < node.left.value:
@@ -733,7 +733,7 @@ class AVLTree:
         return node
     
     def inorder(self, node, result=None):
-        """In-order διάσχιση"""
+        """In-order traversal"""
         if result is None:
             result = []
         if node:
@@ -742,18 +742,18 @@ class AVLTree:
             self.inorder(node.right, result)
         return result
 
-# Παράδειγμα χρήσης
+# Example usage
 avl = AVLTree()
 root = None
 
-# Εισαγωγή στοιχείων που θα προκαλούσαν ανισορροπία σε απλό BST
+# Insert values that would cause imbalance in simple BST
 values = [10, 20, 30, 40, 50, 25]
 for val in values:
     root = avl.insert(root, val)
-    print(f"Μετά την εισαγωγή {val}:")
+    print(f"After inserting {val}:")
     print(f"  In-order: {avl.inorder(root)}")
-    print(f"  Ύψος: {avl.get_height(root)}")
-    print(f"  Balance Factor ρίζας: {avl.get_balance_factor(root)}")
+    print(f"  Height: {avl.get_height(root)}")
+    print(f"  Balance Factor of root: {avl.get_balance_factor(root)}")
 ```
 
 ### C++
@@ -789,32 +789,32 @@ private:
         }
     }
     
-    // LL Rotation - Δεξιά Περιστροφή
+    // LL Rotation - Right Rotation
     AVLNode* rotateRight(AVLNode* y) {
         AVLNode* x = y->left;
         AVLNode* T2 = x->right;
         
-        // Εκτέλεση περιστροφής
+        // Perform rotation
         x->right = y;
         y->left = T2;
         
-        // Ενημέρωση ύψους
+        // Update height
         updateHeight(y);
         updateHeight(x);
         
         return x;
     }
     
-    // RR Rotation - Αριστερή Περιστροφή
+    // RR Rotation - Left Rotation
     AVLNode* rotateLeft(AVLNode* x) {
         AVLNode* y = x->right;
         AVLNode* T2 = y->left;
         
-        // Εκτέλεση περιστροφής
+        // Perform rotation
         y->left = x;
         x->right = T2;
         
-        // Ενημέρωση ύψους
+        // Update height
         updateHeight(x);
         updateHeight(y);
         
@@ -823,7 +823,7 @@ private:
 
 public:
     AVLNode* insert(AVLNode* node, int value) {
-        // Βήμα 1: Κανονική BST εισαγωγή
+        // Step 1: Normal BST insertion
         if (!node) return new AVLNode(value);
         
         if (value < node->value) {
@@ -832,13 +832,13 @@ public:
             node->right = insert(node->right, value);
         }
         
-        // Βήμα 2: Ενημέρωση ύψους
+        // Step 2: Update height
         updateHeight(node);
         
-        // Βήμα 3: Έλεγχος balance factor
+        // Step 3: Check balance factor
         int balance = getBalanceFactor(node);
         
-        // Βήμα 4: Εφαρμογή περιστροφών
+        // Step 4: Apply rotations
         
         // LL Case
         if (balance > 1 && value < node->left->value) {
@@ -893,7 +893,7 @@ int main() {
     AVLTree avl;
     AVLNode* root = nullptr;
     
-    // Εισαγωγή στοιχείων που θα προκαλούσαν ανισορροπία σε απλό BST
+    // Insert values that would cause imbalance in simple BST
     int values[] = {10, 20, 30, 40, 50, 25};
     
     for (int val : values) {
@@ -902,12 +902,12 @@ int main() {
         vector<int> result;
         avl.inorder(root, result);
         
-        cout << "Μετά την εισαγωγή " << val << ":" << endl;
+        cout << "After inserting " << val << ":" << endl;
         cout << "  In-order: ";
         for (int v : result) cout << v << " ";
         cout << endl;
-        cout << "  Ύψος: " << avl.height(root) << endl;
-        cout << "  Balance Factor ρίζας: " << avl.balanceFactor(root) << endl;
+        cout << "  Height: " << avl.height(root) << endl;
+        cout << "  Balance Factor of root: " << avl.balanceFactor(root) << endl;
     }
     
     freeTree(root);
@@ -916,3 +916,4 @@ int main() {
     return 0;
 }
 ```
+
