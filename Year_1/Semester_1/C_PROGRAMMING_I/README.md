@@ -1,5 +1,14 @@
 # C Programming I
 
+## Course Overview
+This course provides an introduction to the C programming language, covering fundamental concepts such as variables, data types, control flow, functions, and arrays. It is designed for beginners with no prior programming experience.
+
+## Course Code
+CPE 101
+
+## Prerequisites
+None
+
 This directory contains a series of C programs that demonstrate fundamental programming concepts. Each file is a standalone program that can be compiled and run to see the concept in action.
 
 ## Files

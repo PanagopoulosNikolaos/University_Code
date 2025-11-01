@@ -1,5 +1,14 @@
 # Logic Design
 
+## Course Overview
+This course introduces the fundamental concepts of digital logic design, including Boolean algebra, logic gates, combinational and sequential circuits.
+
+## Course Code
+CPE 100
+
+## Prerequisites
+None
+
 This directory contains materials for the Logic Design course.
 
 ## Folder Structure

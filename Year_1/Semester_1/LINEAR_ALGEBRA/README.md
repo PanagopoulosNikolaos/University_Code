@@ -1,5 +1,14 @@
 # Linear Algebra
 
+## Course Overview
+This course provides an introduction to the fundamental concepts of linear algebra, including vectors, matrices, systems of linear equations, and eigenvalues.
+
+## Course Code
+MAT 101
+
+## Prerequisites
+None
+
 This directory contains materials for the Linear Algebra course.
 
 ## Folder Structure

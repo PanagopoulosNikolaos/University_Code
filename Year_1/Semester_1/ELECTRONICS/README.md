@@ -1,5 +1,14 @@
 # Electronics
 
+## Course Overview
+This course provides an introduction to the fundamental concepts of electronics, including basic circuit theory, semiconductor devices, and analog circuits.
+
+## Course Code
+ECE 101
+
+## Prerequisites
+None
+
 This directory contains materials for the Electronics course.
 
 ## Folder Structure
